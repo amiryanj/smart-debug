@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="/">
+        <file>png-icons/design-collection/appearance.png</file>
+        <file>png-icons/design-collection/eject-1.png</file>
+        <file>png-icons/design-collection/fast-forward.png</file>
+        <file>png-icons/design-collection/floppy-disk.png</file>
+        <file>png-icons/design-collection/folder.png</file>
+        <file>png-icons/design-collection/hide.png</file>
+        <file>png-icons/design-collection/logout.png</file>
+        <file>png-icons/design-collection/palette.png</file>
+        <file>png-icons/design-collection/pause-1.png</file>
+        <file>png-icons/design-collection/pause-2.png</file>
+        <file>png-icons/design-collection/photo-camera.png</file>
+        <file>png-icons/design-collection/play-1.png</file>
+        <file>png-icons/design-collection/play-2.png</file>
+        <file>png-icons/design-collection/rec-1.png</file>
+        <file>png-icons/design-collection/rec-2.png</file>
+        <file>png-icons/design-collection/rotate-512.png</file>
+        <file>png-icons/design-collection/rotate.png</file>
+        <file>png-icons/design-collection/show.png</file>
+        <file>png-icons/design-collection/stop.png</file>
+        <file>png-icons/design-collection/switch-1.png</file>
+        <file>png-icons/design-collection/switch.png</file>
+        <file>png-icons/media-collection/color-circle.png</file>
+        <file>png-icons/media-collection/diskette.png</file>
+        <file>png-icons/media-collection/eject.png</file>
+        <file>png-icons/media-collection/folder.png</file>
+        <file>png-icons/media-collection/hide-1.png</file>
+        <file>png-icons/media-collection/log-out-1.png</file>
+        <file>png-icons/media-collection/log-out.png</file>
+        <file>png-icons/media-collection/multimedia.png</file>
+        <file>png-icons/media-collection/pause.png</file>
+        <file>png-icons/media-collection/play.png</file>
+        <file>png-icons/media-collection/rec.png</file>
+        <file>png-icons/media-collection/semibreve.png</file>
+        <file>png-icons/media-collection/show-1.png</file>
+        <file>png-icons/media-collection/switch-2.png</file>
+        <file>png-icons/media-collection/switch-3.png</file>
+        <file>png-icons/media-collection/stop.png</file>
+    </qresource>
+</RCC>
