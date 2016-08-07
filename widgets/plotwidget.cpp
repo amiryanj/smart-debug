@@ -99,10 +99,6 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
         }
     }
 
-//    while(n > ui->qPlot->graphCount()/2) {
-
-//    }
-
     for(int i=0; i<n; i++) {
         //! add data to lines:
         ui->qPlot->graph(2*i)->addData(key, vals[i]);
@@ -110,11 +106,10 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
         ui->qPlot->graph(2*i+1)->clearData();
         ui->qPlot->graph(2*i+1)->addData(key, vals[i]);
 
-        // double upper_bound = qMax(val[i] , ui->qPlot->yAxis->range().upper) * 2.0;
-        // double lower_bound = qMin(val[i] , ui->qPlot->yAxis->range().lower) * 2.0;
-
-        // ui->qPlot->yAxis->setRangeUpper(upper_bound);
-        // ui->qPlot->yAxis->setRangeLower(lower_bound);
+         double upper_bound = qMax(vals[i] , ui->qPlot->yAxis->range().upper) * 2.0;
+         double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) * 2.0;
+         ui->qPlot->yAxis->setRangeUpper(upper_bound);
+         ui->qPlot->yAxis->setRangeLower(lower_bound);
 
         // ui->qPlot->yAxis->setRangeUpper(-3000);
         // ui->qPlot->yAxis->setRangeLower(3000);
