@@ -97,22 +97,23 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
             g2->setLineStyle(QCPGraph::lsNone);
             g2->setScatterStyle(QCPScatterStyle::ssDisc);
         }
-    }
 
-    for(int i=0; i<n; i++) {
         //! add data to lines:
-        ui->qPlot->graph(2*i)->addData(key, vals[i]);
-        ui->qPlot->graph(2*i)->removeDataBefore(key-120);  // delete memory after 2 minutes
-        ui->qPlot->graph(2*i+1)->clearData();
-        ui->qPlot->graph(2*i+1)->addData(key, vals[i]);
+        g1->addData(key, vals[i]);
+        g1->removeDataBefore(key-120);  // delete memory after 2 minutes
+        g2->clearData();
+        g2->addData(key, vals[i]);
 
-         double upper_bound = qMax(vals[i] , ui->qPlot->yAxis->range().upper) * 2.0;
-         double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) * 2.0;
+         double upper_bound = qMax(vals[i] , ui->qPlot->yAxis->range().upper) ;
+         double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) ;
          ui->qPlot->yAxis->setRangeUpper(upper_bound);
          ui->qPlot->yAxis->setRangeLower(lower_bound);
 
         // ui->qPlot->yAxis->setRangeUpper(-3000);
         // ui->qPlot->yAxis->setRangeLower(3000);
+    }
+
+    for(int i=0; i<n; i++) {
     }
     // make key axis range scroll with the data (at a constant range size of 8):
     if(!freezed)
