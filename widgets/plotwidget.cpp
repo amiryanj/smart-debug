@@ -104,17 +104,15 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
         g2->clearData();
         g2->addData(key, vals[i]);
 
-         double upper_bound = qMax(vals[i] , ui->qPlot->yAxis->range().upper) ;
-         double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) ;
-         ui->qPlot->yAxis->setRangeUpper(upper_bound);
-         ui->qPlot->yAxis->setRangeLower(lower_bound);
+        double upper_bound = qMax(vals[i] , ui->qPlot->yAxis->range().upper) ;
+        double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) ;
+        ui->qPlot->yAxis->setRangeUpper(upper_bound);
+        ui->qPlot->yAxis->setRangeLower(lower_bound);
 
         // ui->qPlot->yAxis->setRangeUpper(-3000);
         // ui->qPlot->yAxis->setRangeLower(3000);
     }
 
-    for(int i=0; i<n; i++) {
-    }
     // make key axis range scroll with the data (at a constant range size of 8):
     if(!freezed)
         ui->qPlot->xAxis->setRange(key+4, 20, Qt::AlignRight);
@@ -147,9 +145,9 @@ void PlotWidget::addValue(double val, double key, QString legend)
     QVector<QString> legVector(1, legend);
     addValue(key, valVector, legVector);
 
-//    static int cntr = 0;
-//    cntr ++;
-//    addValue(cntr, val);
+    //    static int cntr = 0;
+    //    cntr ++;
+    //    addValue(cntr, val);
 }
 
 void PlotWidget::forceToPause()

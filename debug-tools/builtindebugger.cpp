@@ -1,9 +1,9 @@
 #include "builtindebugger.h"
-#include "mainwindow.h"
+#include <QWidget>
 #include <QVector>
+#include <QDateTime>
 #include <iostream>
 #include <sstream>
-#include <QDateTime>
 
 using namespace std;
 namespace dbug
