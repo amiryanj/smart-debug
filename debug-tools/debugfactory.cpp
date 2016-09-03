@@ -42,7 +42,7 @@ DebugFactory::DebuggerStyle DebugFactory::getDebuggerStyle() {
 
 void DebugFactory::clearDebugger()
 {
-    cout << "deleting pitch model in PitchModelFactory destructor" << endl;
+    cout << "deleting debugger in debug factory destructor" << endl;
     if(sDebugger)
         delete sDebugger;
     sDebugger = NULL;
