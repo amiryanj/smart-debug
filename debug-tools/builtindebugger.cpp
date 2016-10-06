@@ -10,9 +10,10 @@ namespace dbug
 {
 BuiltInDebug::BuiltInDebug(QWidget *parent) : QObject()
 {
-    plot_manager = new WidgetsManager(parent);
-    plot_manager->show();
-    connect(this, &BuiltInDebug::plotRequest, plot_manager, &WidgetsManager::plot);
+    widgets_manager = new WidgetsManager(parent);
+    widgets_manager->show();
+    connect(this, &BuiltInDebug::plotRequest, widgets_manager, &WidgetsManager::plot);
+    connect(this, &BuiltInDebug::scatterRequest, widgets_manager, &WidgetsManager::scatter);
 }
 
 void BuiltInDebug::print(const char *msg, double time, const string &category)
@@ -46,6 +47,21 @@ void BuiltInDebug::plot(const string &name, double value, double key, const stri
     packet.key = key;
     packet.name = category;
     emit plotRequest(packet);
+}
+
+void BuiltInDebug::scatter(ScatterPacket &packet)
+{
+    scatterRequest(packet);
+}
+
+void BuiltInDebug::scatter(double x, double y, string name, const string &category)
+{
+    ScatterPacket packet;
+    packet.x = x;
+    packet.y = y;
+    packet.name = category;
+    packet.legend = name;
+    scatterRequest(packet);
 }
 
 

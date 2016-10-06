@@ -17,7 +17,7 @@
 namespace Ui {
 class ScatterPlotWidget;
 }
-
+namespace dbug {
 class ScatterPlotWidget : public QWidget
 {
     Q_OBJECT
@@ -29,9 +29,14 @@ public:
     void setData(const QVector<QPoint> &data);
     void addData(const QPointF &p);
     void clearData();
+    void setName(const QString &name);
+
+    void mouseWheel();
+
     
 private:
     Ui::ScatterPlotWidget *ui;
 };
+}
 
 #endif // SCATTERPLOTWIDGET_H

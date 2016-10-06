@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "plotterpacket.h"
+#include "scatterpacket.h"
 
 namespace dbug {
 
@@ -23,8 +24,8 @@ namespace dbug {
         virtual void plot(PlotterPacket &packet) = 0;
         virtual void plot(const std::string &name, double value, double key = -1, const std::string &category = "general") {}
 
+        virtual void scatter(ScatterPacket &packet) = 0;
         virtual void scatter(double x, double y, std::string name = "", const std::string &category = "general") {}
-        virtual void scatter(const QVector2D& data, std::string name = "", const std::string &category = "general") {}
 
         virtual void drawCircle() {}
         virtual void drawLine() {}

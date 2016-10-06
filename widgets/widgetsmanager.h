@@ -17,6 +17,7 @@
 #include <QTimer>
 #include <QMap>
 #include "plotterpacket.h"
+#include "scatterpacket.h"
 
 namespace Ui {
 class WidgetsManager;
@@ -24,6 +25,7 @@ class WidgetsManager;
 namespace dbug
 {
     class PlotWidget;
+    class ScatterPlotWidget;
 
     class WidgetsManager : public QWidget
     {
@@ -34,6 +36,7 @@ namespace dbug
 
     public slots:
         void plot(const PlotterPacket &packet);
+        void scatter(const ScatterPacket &packet);
 
     private slots:
         void turnOffWidget(const QString &name);
@@ -47,6 +50,7 @@ namespace dbug
     private:
         Ui::WidgetsManager *ui;
         QMap<QString , PlotWidget*> mPlotsMap;
+        QMap<QString , ScatterPlotWidget*> mScattersMap;
 
         void savePlotterPacket(double key, const PlotterPacket& packet);
     };

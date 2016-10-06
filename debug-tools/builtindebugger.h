@@ -14,7 +14,7 @@ namespace dbug
     public:
         BuiltInDebug(QWidget* parent = 0);
         QWidget* widget() const {
-            return plot_manager;
+            return widgets_manager;
         }
         ~BuiltInDebug() {}
 
@@ -24,17 +24,21 @@ namespace dbug
         void plot(PlotterPacket &packet);
         void plot(const std::string &name, double value, double key = -1, const std::string &category = "general");
 
+        void scatter(ScatterPacket &packet);
+        void scatter(double x, double y, std::string name = "", const std::string &category = "general");
+
     //    void drawCircle();
     //    void drawLine();
     //    void drawRect();
 
     signals:
         void plotRequest(const PlotterPacket &p);
+        void scatterRequest(const ScatterPacket &p);
         void printRequest(QString msg , QString category);
 
     protected:
         PlotterPacket under_use_plotter_packet;
-        WidgetsManager* plot_manager;
+        WidgetsManager* widgets_manager;
 
 
     };

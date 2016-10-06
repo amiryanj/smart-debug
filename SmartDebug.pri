@@ -16,7 +16,8 @@ SOURCES += \
 #    $$PWD/debug-tools/networkplotter.cpp \
     $$PWD/widgets/plotwidget.cpp \
     $$PWD/widgets/scatterplotwidget.cpp \
-    $$PWD/widgets/widgetsmanager.cpp
+    $$PWD/widgets/widgetsmanager.cpp \
+    $$PWD/debug-tools/scatterpacket.cpp
 
 HEADERS += \
     $$PWD/qcustomplot/qcustomplot.h \
@@ -28,7 +29,8 @@ HEADERS += \
 #    $$PWD/debug-tools/networkplotter.h \
     $$PWD/widgets/plotwidget.h \
     $$PWD/widgets/scatterplotwidget.h \
-    $$PWD/widgets/widgetsmanager.h
+    $$PWD/widgets/widgetsmanager.h \
+    $$PWD/debug-tools/scatterpacket.h
 
 FORMS += \
     $$PWD/widgets/plotwidget.ui \

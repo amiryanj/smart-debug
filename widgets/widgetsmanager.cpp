@@ -11,6 +11,7 @@
 #include "widgetsmanager.h"
 #include "ui_widgetsmanager.h"
 #include "plotwidget.h"
+#include "scatterplotwidget.h"
 #include "logger.h"
 
 #include <QDateTime>
@@ -55,21 +56,22 @@ void WidgetsManager::plot(const PlotterPacket &packet)
         if(packet.legends.size() != packet.values.size())
             throw "";
 
+        QString q_name = QString::fromStdString(packet.name);
         QVector<double> valuesQVec = QVector<double>::fromStdVector(packet.values);
         QVector<QString> legendsQVec;
         for(uint i=0; i<packet.legends.size(); i++)
             legendsQVec.append(QString::fromStdString(packet.legends[i]));
 
-        if( !mPlotsMap.keys().contains(QString::fromStdString(packet.name) ) )
+        if( !mPlotsMap.keys().contains(q_name))
         {
             PlotWidget* new_plot = new PlotWidget(ui->scrollAreaWidgetContents);
             ui->verticalLayout->addWidget(new_plot);
-            new_plot->setName(QString::fromStdString(packet.name));
+            new_plot->setName(q_name);
             new_plot->setLegendsFont(QFont("Ubuntu", 9));
-            mPlotsMap.insert(QString::fromStdString(packet.name), new_plot);
+            mPlotsMap.insert(q_name, new_plot);
             connect(new_plot, SIGNAL(closeMe(QString)), this, SLOT(turnOffWidget(QString)));
         }
-        mPlotsMap[QString(packet.name.c_str())]->addValue(packet.key, valuesQVec, legendsQVec);
+        mPlotsMap[q_name]->addValue(packet.key, valuesQVec, legendsQVec);
 
         if(ui->recordButton->isChecked())
         {
@@ -80,6 +82,18 @@ void WidgetsManager::plot(const PlotterPacket &packet)
     catch (const char* msg) {
         qDebug() << "Error: PlotManagerWidget: " << msg << endl;
     }
+}
+
+void WidgetsManager::scatter(const ScatterPacket &packet)
+{
+    QString q_name = QString::fromStdString(packet.name);
+    if(!mScattersMap.keys().contains(q_name))
+    {
+        ScatterPlotWidget *new_scatter = new ScatterPlotWidget(ui->scrollAreaWidgetContents);
+        ui->verticalLayout->addWidget(new_scatter);
+        mScattersMap.insert(q_name, new_scatter);
+    }
+    mScattersMap[q_name]->addData(QPointF(packet.x, packet.y));
 }
 
 void WidgetsManager::turnOffWidget(const QString &name)
