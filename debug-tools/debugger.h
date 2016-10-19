@@ -1,9 +1,8 @@
 #ifndef DEBUGCLIENT_H
 #define DEBUGCLIENT_H
 
-#include <QVector2D>
 #include <string>
-#include <vector>
+#include <QVector2D>
 #include "plotterpacket.h"
 #include "scatterpacket.h"
 
@@ -14,12 +13,12 @@ namespace dbug {
     protected:
 
     public:
-        Debugger(QWidget* parent = 0) {}
+        Debugger(QWidget* parent = 0) { (void) parent; }
         virtual QWidget *widget() const { return NULL;}
         virtual ~Debugger() {;}
 
-        virtual void print(const char* msg, double time, const std::string &category = "general") {}
-        virtual void print(const char *msg, const std::string &category = "general") {}
+        virtual void print(const char* msg, double time, const std::string &category = "general") = 0;
+        virtual void print(const char *msg, const std::string &category = "general") = 0;
 
         virtual void plot(PlotterPacket &packet) = 0;
         virtual void plot(const std::string &name, double value, double key = -1, const std::string &category = "general") {}

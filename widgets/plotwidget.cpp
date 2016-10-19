@@ -34,7 +34,7 @@ PlotWidget::PlotWidget(QWidget *parent) :
 
     // ************* Set Axis Settings ****************
     ui->qPlot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
+    //ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
     ui->qPlot->xAxis->setAutoTickStep(true);
     ui->qPlot->xAxis->setTickStep(1);
     ui->qPlot->xAxis->setTickLabelRotation(30);
@@ -65,7 +65,7 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
         return;
 
     // ************* Adding New Graph *****************
-    static QVector<QColor> colorList {Qt::green, Qt::red, Qt::darkGreen, Qt::darkYellow, Qt::darkRed};
+    static QVector<QColor> colorList {Qt::green, Qt::red, Qt::magenta, Qt::blue, Qt::darkGreen, Qt::darkYellow, Qt::darkRed};
     int n = vals.size();
 
     for(int i=0; i<legends.size(); i++)
@@ -89,7 +89,7 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
 
             g1->setName(legends[i]);
 
-            g1->setPen(colorList[k%colorList.size()]);
+            g1->setPen(colorList[(k/2)%colorList.size()]);
             ui->qPlot->legend->removeItem(ui->qPlot->legend->itemCount()-1); // don't show two graphs in legend
 
             // Add a blue dot in end of graph
@@ -100,7 +100,7 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
 
         //! add data to lines:
         g1->addData(key, vals[i]);
-        g1->removeDataBefore(key-120);  // delete memory after 2 minutes
+        //g1->removeDataBefore(key-120);  // delete memory after 2 minutes
         g2->clearData();
         g2->addData(key, vals[i]);
 
@@ -108,6 +108,9 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
         double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) ;
         ui->qPlot->yAxis->setRangeUpper(upper_bound);
         ui->qPlot->yAxis->setRangeLower(lower_bound);
+
+        if(key > QDateTime::currentMSecsSinceEpoch()/2)
+            ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
 
         // ui->qPlot->yAxis->setRangeUpper(-3000);
         // ui->qPlot->yAxis->setRangeLower(3000);

@@ -75,13 +75,15 @@ void ScatterPlotWidget::addData(const QPointF &p)
     QVector<double> y;
     x.append(p.x());
     y.append(p.y());
-    ui->scatter->graph(1)->setData(x, y);;
+    ui->scatter->graph(1)->setData(x, y);
+    ui->scatter->replot();
 }
 
 void ScatterPlotWidget::clearData()
 {
     ui->scatter->graph(0)->clearData();
     ui->scatter->graph(1)->clearData();
+    ui->scatter->replot();
 }
 
 void ScatterPlotWidget::mouseWheel()

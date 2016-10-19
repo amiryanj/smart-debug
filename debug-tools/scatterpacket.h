@@ -15,7 +15,7 @@
 class ScatterPacket
 {
 public:
-    ScatterPacket();
+    ScatterPacket() {}
     double x, y;
     std::string legend;
     std::string name; // category

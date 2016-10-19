@@ -9,7 +9,3 @@
 //========================================================================
 #include "scatterpacket.h"
 
-ScatterPacket::ScatterPacket()
-{
-
-}
