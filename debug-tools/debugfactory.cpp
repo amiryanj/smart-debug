@@ -9,6 +9,9 @@ namespace dbug {
 DebugFactory::DebuggerStyle DebugFactory::sDebuggerStyle = DebugFactory::DebuggerStyle::eBuiltInDebugger;
 Debugger*     DebugFactory::sDebugger = NULL;
 
+std::map<std::string, PlotterWidget*> DebugFactory::plotterMap;
+std::map<std::string, ScatterWidget*> DebugFactory::scatterMap;
+
 Debugger *DebugFactory::createDebugger(DebugFactory::DebuggerStyle style, QWidget *parent)
 {
     if(sDebugger)
@@ -18,7 +21,7 @@ Debugger *DebugFactory::createDebugger(DebugFactory::DebuggerStyle style, QWidge
     sDebuggerStyle = style;
     switch (sDebuggerStyle) {
     case DebuggerStyle::eBuiltInDebugger:
-         sDebugger = new BuiltInDebug(parent);
+         sDebugger = new BuiltInDebugger(parent);
         break;
 
     case DebuggerStyle::eNetworkDebugger:
@@ -43,10 +46,20 @@ DebugFactory::DebuggerStyle DebugFactory::getDebuggerStyle() {
 void DebugFactory::clearDebugger()
 {
     cout << "deleting debugger in debug factory destructor" << endl;
+
+    for(auto itr = plotterMap.begin(); itr != plotterMap.end(); itr++) {
+        delete itr->second;
+    }
+    plotterMap.clear();
+
+    for(auto itr = scatterMap.begin(); itr != scatterMap.end(); itr++) {
+        delete itr->second;
+    }
+    scatterMap.clear();
+
     if(sDebugger)
         delete sDebugger;
     sDebugger = NULL;
-
 }
 
 Debugger *dbuger() {

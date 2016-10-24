@@ -1,15 +1,14 @@
 //========================================================================
 /*!
-  @file
-  @class
-  @date    1/31/2016
+  @file    plotter.h
+  @class   Plotter
+  @date    10/24/2016
   @brief
   @author  Javad Amiryan, (C) 2016
 */
 //========================================================================
-
-#ifndef _PLOTTERPACKET_H
-#define _PLOTTERPACKET_H
+#ifndef _PLOTTER_H
+#define _PLOTTER_H
 
 #include <vector>
 #include <string>
@@ -29,12 +28,23 @@ public:
     void append(const string &name_, double value_);
 
     string toJson() const;
+    string toCSV() const;
 
     string name;
     double key;  //negative values are considered invalid
     vector<double> values;
     vector<string> legends;
 };
+
+class Plotter
+{
+public:
+    Plotter();
+
+    virtual void addValue(double val, double key = -1, std::string legend = "") =0;
+    virtual void addPacket(const PlotterPacket& packet) =0;
+};
+
 }
 
-#endif // PLOTTERPACKET_H
+#endif // PLOTTER_H

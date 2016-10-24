@@ -3,46 +3,33 @@
 
 #include <QTimer>
 #include <qcustomplot.h>
+#include "plotter.h"
 
 namespace Ui {
-class PlotWidget;
+class PlotterWidget;
 }
 namespace dbug {
 
-class PlotWidget : public QWidget
+class PlotterWidget : public QWidget, public Plotter
 {
     Q_OBJECT
     
 public:
-    explicit PlotWidget(QWidget *parent = 0);
-    ~PlotWidget();
+    explicit PlotterWidget();
+    ~PlotterWidget();
 
     void setName(QString name);
     void setLegendsFont(const QFont &font);
 
 public slots:
-    void addValue(double val, double key = -1, QString legend = "");
+    void addValue(double val, double key = -1, std::string legend = "");
+    void addPacket(const PlotterPacket &packet);
+
     void addValue(double key, const QVector<double> &vals, const QVector<QString> &legends);
     void forceToPause();
     void forceToPlay();
-
     void setConnected(bool connected);
-
     void setYAxisRange(double lower, double upper);
-
-signals:
-    void closeMe(QString);
-    void setMeMinimized(QString, bool);
-    
-private:
-    Ui::PlotWidget *ui;
-    QGraphicsPixmapItem* statusGItem;
-    QMap<QString, QPair<QCPGraph*, QCPGraph*> > graphsMap;
-
-    double mKey;
-    QString plotName;
-    bool connected;
-    bool freezed;
 
 private slots:
     void selectionChanged();
@@ -53,6 +40,18 @@ private slots:
     void on_minimizeButton_clicked(bool checked);
     void on_pauseButton_clicked(bool checked);
     void on_recButton_clicked(bool checked);
+
+signals:
+    void closeMe(QString);
+    void setMeMinimized(QString, bool);
+    
+private:
+    Ui::PlotterWidget *ui;
+    QGraphicsPixmapItem* statusGItem;
+
+    QString plotName;
+    bool connected;
+    bool freezed;
 };
 }
 

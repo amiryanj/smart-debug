@@ -11,31 +11,33 @@ SOURCES += \
     $$PWD/debug-tools/builtindebugger.cpp \
     $$PWD/debug-tools/debugger.cpp \
     $$PWD/debug-tools/logger.cpp \
-    $$PWD/debug-tools/plotterpacket.cpp \
     $$PWD/debug-tools/debugfactory.cpp \
 #    $$PWD/debug-tools/networkplotter.cpp \
-    $$PWD/widgets/plotwidget.cpp \
-    $$PWD/widgets/scatterplotwidget.cpp \
-    $$PWD/widgets/widgetsmanager.cpp \
-    $$PWD/debug-tools/scatterpacket.cpp
+    $$PWD/widgets/scatterwidget.cpp \
+    $$PWD/widgets/builtinwidgetmanager.cpp \
+    $$PWD/debug-tools/widgetmanger.cpp \
+    $$PWD/debug-tools/plotter.cpp \
+    $$PWD/debug-tools/scatter.cpp \
+    $$PWD/widgets/plotterwidget.cpp
 
 HEADERS += \
     $$PWD/qcustomplot/qcustomplot.h \
     $$PWD/debug-tools/builtindebugger.h \
     $$PWD/debug-tools/debugger.h \
     $$PWD/debug-tools/logger.h \
-    $$PWD/debug-tools/plotterpacket.h \
     $$PWD/debug-tools/debugfactory.h \
 #    $$PWD/debug-tools/networkplotter.h \
-    $$PWD/widgets/plotwidget.h \
-    $$PWD/widgets/scatterplotwidget.h \
-    $$PWD/widgets/widgetsmanager.h \
-    $$PWD/debug-tools/scatterpacket.h
+    $$PWD/widgets/scatterwidget.h \
+    $$PWD/widgets/builtinwidgetmanager.h \
+    $$PWD/debug-tools/widgetmanger.h \
+    $$PWD/debug-tools/plotter.h \
+    $$PWD/debug-tools/scatter.h \
+    $$PWD/widgets/plotterwidget.h
 
 FORMS += \
-    $$PWD/widgets/plotwidget.ui \
-    $$PWD/widgets/widgetsmanager.ui \
-    $$PWD/widgets/scatterplotwidget.ui
+    $$PWD/widgets/builtinwidgetmanager.ui \
+    $$PWD/widgets/scatterwidget.ui \
+    $$PWD/widgets/plotterwidget.ui
 
 
 RESOURCES += \

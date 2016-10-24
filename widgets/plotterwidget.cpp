@@ -1,11 +1,10 @@
-#include "plotwidget.h"
-#include "ui_plotwidget.h"
+#include "plotterwidget.h"
+#include "ui_plotterwidget.h"
 
 namespace dbug {
 
-PlotWidget::PlotWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::PlotWidget)
+PlotterWidget::PlotterWidget() :
+    ui(new Ui::PlotterWidget)
 {
     ui->setupUi(this);
     ui->statusFrame->hide();
@@ -45,21 +44,25 @@ PlotWidget::PlotWidget(QWidget *parent) :
     freezed = false;
 }
 
-void PlotWidget::setName(QString name)
+void PlotterWidget::setName(QString name)
 {
     this->plotName = name;
     ui->minimizeButton->setToolTip("Plot: " + name);
 }
 
-void PlotWidget::setLegendsFont(const QFont& font)
+void PlotterWidget::setLegendsFont(const QFont& font)
 {
     ui->qPlot->legend->setVisible(true);
     ui->qPlot->legend->setFont(font);
-    ui->qPlot->legend->setRowSpacing(-3);
+    ui->qPlot->legend->setRowSpacing(-3);    
+}
+
+void PlotterWidget::addPacket(const PlotterPacket &packet)
+{
 
 }
 
-void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector<QString> &legends)
+void PlotterWidget::addValue(double key, const QVector<double> &vals, const QVector<QString> &legends)
 {
     if(!this->connected)
         return;
@@ -138,14 +141,13 @@ void PlotWidget::addValue(double key, const QVector<double> &vals, const QVector
 
 }
 
-void PlotWidget::addValue(double val, double key, QString legend)
+void PlotterWidget::addValue(double val, double key, string legend)
 {
     if(key < 0)
         key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0 ;
-    mKey = key;
 
     QVector<double> valVector(1, val);
-    QVector<QString> legVector(1, legend);
+    QVector<QString> legVector(1, QString::fromStdString(legend));
     addValue(key, valVector, legVector);
 
     //    static int cntr = 0;
@@ -153,33 +155,33 @@ void PlotWidget::addValue(double val, double key, QString legend)
     //    addValue(cntr, val);
 }
 
-void PlotWidget::forceToPause()
+void PlotterWidget::forceToPause()
 {
     if(!freezed)
         ui->pauseButton->click();
 }
-void PlotWidget::forceToPlay()
+void PlotterWidget::forceToPlay()
 {
     if(freezed)
         ui->pauseButton->click();
 }
 
-void PlotWidget::setConnected(bool connected)
+void PlotterWidget::setConnected(bool connected)
 {
     this->connected = connected;
 }
 
-void PlotWidget::setYAxisRange(double lower, double upper)
+void PlotterWidget::setYAxisRange(double lower, double upper)
 {
     ui->qPlot->yAxis->setRange(lower, upper);
 }
 
-PlotWidget::~PlotWidget()
+PlotterWidget::~PlotterWidget()
 {
     delete ui;
 }
 
-void PlotWidget::selectionChanged()
+void PlotterWidget::selectionChanged()
 {
     /*
    normally, axis base line, axis tick labels and axis labels are selectable separately, but we want
@@ -222,7 +224,7 @@ void PlotWidget::selectionChanged()
     }
 }
 
-void PlotWidget::mousePress()
+void PlotterWidget::mousePress()
 {
     // if an axis is selected, only allow the direction of that axis to be dragged
     // if no axis is selected, both directions may be dragged
@@ -235,7 +237,7 @@ void PlotWidget::mousePress()
         ui->qPlot->axisRect()->setRangeDrag(Qt::Horizontal|Qt::Vertical);
 }
 
-void PlotWidget::mouseWheel()
+void PlotterWidget::mouseWheel()
 {
     // if an axis is selected, only allow the direction of that axis to be zoomed
     // if no axis is selected, both directions may be zoomed
@@ -248,18 +250,18 @@ void PlotWidget::mouseWheel()
         ui->qPlot->axisRect()->setRangeZoom(Qt::Horizontal|Qt::Vertical);
 }
 
-void PlotWidget::graphClicked(QCPAbstractPlottable *plottable)
+void PlotterWidget::graphClicked(QCPAbstractPlottable *plottable)
 {
     //    ui->vel_label->setText(plottable->name());
 }
 
 
-void PlotWidget::on_closeButton_clicked()
+void PlotterWidget::on_closeButton_clicked()
 {
     emit closeMe(this->plotName);
 }
 
-void PlotWidget::on_minimizeButton_clicked(bool checked)
+void PlotterWidget::on_minimizeButton_clicked(bool checked)
 {
     if(checked) {
         ui->qPlot->hide();
@@ -284,12 +286,12 @@ void PlotWidget::on_minimizeButton_clicked(bool checked)
     }
 }
 
-void PlotWidget::on_pauseButton_clicked(bool checked)
+void PlotterWidget::on_pauseButton_clicked(bool checked)
 {
     freezed = checked;
 }
 
-void PlotWidget::on_recButton_clicked(bool checked)
+void PlotterWidget::on_recButton_clicked(bool checked)
 {
     //if(checked)
 }

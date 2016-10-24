@@ -1,0 +1,19 @@
+//========================================================================
+/*!
+  @file    scatter.cpp
+  @class   Scatter
+  @date    10/24/2016
+  @brief
+  @author  Javad Amiryan, (C) 2016
+*/
+//========================================================================
+#include "scatter.h"
+
+namespace dbug {
+
+Scatter::Scatter()
+{
+
+}
+
+}

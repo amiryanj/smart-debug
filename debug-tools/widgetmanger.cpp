@@ -1,11 +1,20 @@
 //========================================================================
 /*!
-  @file    scatterpacket.cpp
-  @class   ScatterPacket
-  @date    10/2/2016
+  @file    widgetmanger.cpp
+  @class   WidgetManger
+  @date    10/24/2016
   @brief
   @author  Javad Amiryan, (C) 2016
 */
 //========================================================================
-#include "scatterpacket.h"
+#include "widgetmanger.h"
+
+namespace dbug {
+
+WidgetManger::WidgetManger()
+{
+
+}
+
+}
 

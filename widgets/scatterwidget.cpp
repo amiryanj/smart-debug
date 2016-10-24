@@ -8,13 +8,12 @@
 */
 //========================================================================
 
-#include "scatterplotwidget.h"
-#include "ui_scatterplotwidget.h"
+#include "scatterwidget.h"
+#include "ui_scatterwidget.h"
 namespace dbug {
 
-ScatterPlotWidget::ScatterPlotWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ScatterPlotWidget)
+ScatterWidget::ScatterWidget() :
+    ui(new Ui::ScatterWidget)
 {
     ui->setupUi(this);
 
@@ -49,12 +48,12 @@ ScatterPlotWidget::ScatterPlotWidget(QWidget *parent) :
     ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
 }
 
-ScatterPlotWidget::~ScatterPlotWidget()
+ScatterWidget::~ScatterWidget()
 {
     delete ui;
 }
 
-void ScatterPlotWidget::setData(const QVector<QPoint> &data)
+void ScatterWidget::setData(const QVector<QPoint> &data)
 {
     QVector<double> x;
     QVector<double> y;
@@ -67,9 +66,9 @@ void ScatterPlotWidget::setData(const QVector<QPoint> &data)
     ui->scatter->replot();
 }
 
-void ScatterPlotWidget::addData(const QPointF &p)
+void ScatterWidget::addData(const QPointF &p)
 {
-    ui->scatter->graph(0)->addData(p.x(), p.y());;
+    ui->scatter->graph(0)->addData(p.x(), p.y());
 
     QVector<double> x;
     QVector<double> y;
@@ -79,14 +78,19 @@ void ScatterPlotWidget::addData(const QPointF &p)
     ui->scatter->replot();
 }
 
-void ScatterPlotWidget::clearData()
+void ScatterWidget::addData(float x, float y)
+{
+    this->addData(QPoint(x, y));
+}
+
+void ScatterWidget::clearData()
 {
     ui->scatter->graph(0)->clearData();
     ui->scatter->graph(1)->clearData();
     ui->scatter->replot();
 }
 
-void ScatterPlotWidget::mouseWheel()
+void ScatterWidget::mouseWheel()
 {
     // if an axis is selected, only allow the direction of that axis to be zoomed
     // if no axis is selected, both directions may be zoomed

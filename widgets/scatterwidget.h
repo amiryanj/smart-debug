@@ -8,34 +8,36 @@
 */
 //========================================================================
 
-#ifndef _SCATTERPLOTWIDGET_H
-#define _SCATTERPLOTWIDGET_H
+#ifndef _SCATTERWIDGET_H
+#define _SCATTERWIDGET_H
 
 #include <QWidget>
 #include "qcustomplot/qcustomplot.h"
+#include "scatter.h"
 
 namespace Ui {
-class ScatterPlotWidget;
+class ScatterWidget;
 }
 namespace dbug {
-class ScatterPlotWidget : public QWidget
+class ScatterWidget : public QWidget, public Scatter
 {
     Q_OBJECT
     
 public:
-    explicit ScatterPlotWidget(QWidget *parent = 0);
-    ~ScatterPlotWidget();
+    explicit ScatterWidget();
+    ~ScatterWidget();
 
     void setData(const QVector<QPoint> &data);
+    virtual void addPacket(const ScatterPacket& packet) {}
     void addData(const QPointF &p);
+    void addData(float x, float y);
     void clearData();
-    void setName(const QString &name);
 
     void mouseWheel();
 
     
 private:
-    Ui::ScatterPlotWidget *ui;
+    Ui::ScatterWidget *ui;
 };
 }
 

@@ -1,23 +1,26 @@
 #ifndef BUILTINDEBUG_H
 #define BUILTINDEBUG_H
 
-#include "widgetsmanager.h"
+#include "builtinwidgetmanager.h"
 #include "debugger.h"
+#include "scatterwidget.h"
+#include "plotterwidget.h"
 #include <QObject>
 #include <QString>
 
 namespace dbug
 {
-    class BuiltInDebug : public QObject , public Debugger
+    class BuiltInDebugger : public QObject , public Debugger
     {
         Q_OBJECT
     public:
-        BuiltInDebug(QWidget* parent = 0);
-        QWidget* widget() const {
+        BuiltInDebugger(QWidget* parent = 0);
+        BuiltInWidgetManager* widgetManager() const {
             return widgets_manager;
         }
-        ~BuiltInDebug() {}
+        ~BuiltInDebugger() {}
 
+        /// c-style functions
         void print(const char *msg, const std::string &category = "general");
         void print(const char* msg, double time, const std::string &category = "general");
 
@@ -26,6 +29,9 @@ namespace dbug
 
         void scatter(ScatterPacket &packet);
         void scatter(double x, double y, std::string name = "", const std::string &category = "general");
+
+        PlotterWidget *getPlotter(const std::string &name);
+        ScatterWidget *getScatter(const std::string &name);
 
     //    void drawCircle();
     //    void drawLine();
@@ -38,7 +44,7 @@ namespace dbug
 
     protected:
         PlotterPacket under_use_plotter_packet;
-        WidgetsManager* widgets_manager;
+        BuiltInWidgetManager* widgets_manager;
 
 
     };

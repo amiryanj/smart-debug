@@ -1,20 +1,23 @@
-#ifndef DEBUGCLIENT_H
-#define DEBUGCLIENT_H
+#ifndef _DEBUGGER_H
+#define _DEBUGGER_H
 
-#include <string>
-#include <QVector2D>
-#include "plotterpacket.h"
-#include "scatterpacket.h"
+#include <map>
+#include "plotter.h"
+#include "scatter.h"
+#include "widgetmanger.h"
+#include "logger.h"
 
 namespace dbug {
 
     class Debugger
     {
     protected:
+        std::map<std::string, Plotter*> plotterMap;
+        std::map<std::string, Scatter*> scatterMap;
 
     public:
-        Debugger(QWidget* parent = 0) { (void) parent; }
-        virtual QWidget *widget() const { return NULL;}
+        Debugger() { }
+        virtual WidgetManger *widgetManager() const { return NULL;}
         virtual ~Debugger() {;}
 
         virtual void print(const char* msg, double time, const std::string &category = "general") = 0;
@@ -29,6 +32,11 @@ namespace dbug {
         virtual void drawCircle() {}
         virtual void drawLine() {}
         virtual void drawRect() {}
+
+
+        virtual Plotter* getPlotter(const std::string &name) { (void) name; }
+        virtual Scatter* getScatter(const std::string &name) { (void) name; }
+        virtual Logger*  getLogger (const std::string &name) { (void) name; }
 
     };
 

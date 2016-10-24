@@ -8,15 +8,15 @@
 using namespace std;
 namespace dbug
 {
-BuiltInDebug::BuiltInDebug(QWidget *parent) : QObject()
+BuiltInDebugger::BuiltInDebugger(QWidget *parent) : QObject()
 {
-    widgets_manager = new WidgetsManager(parent);
+    widgets_manager = new BuiltInWidgetManager(parent);
     widgets_manager->show();
-    connect(this, &BuiltInDebug::plotRequest, widgets_manager, &WidgetsManager::plot);
-    connect(this, &BuiltInDebug::scatterRequest, widgets_manager, &WidgetsManager::scatter);
+//    connect(this, &BuiltInDebug::plotRequest, widgets_manager, &WidgetsManager::plot);
+//    connect(this, &BuiltInDebug::scatterRequest, widgets_manager, &WidgetsManager::scatter);
 }
 
-void BuiltInDebug::print(const char *msg, double time, const string &category)
+void BuiltInDebugger::print(const char *msg, double time, const string &category)
 {
     ostringstream ss;
     ss << msg << "  " << time;
@@ -25,20 +25,20 @@ void BuiltInDebug::print(const char *msg, double time, const string &category)
     //  cout << "[" << category << "] " << "(" << time << "): " << msg << endl;
 }
 
-void BuiltInDebug::print(const char *msg, const string &category)
+void BuiltInDebugger::print(const char *msg, const string &category)
 {
     emit printRequest(msg, QString::fromStdString(category));
     //  cout << "[" << category << "]:" << msg << endl;
 }
 
-void BuiltInDebug::plot(PlotterPacket &packet)
+void BuiltInDebugger::plot(PlotterPacket &packet)
 {
     if(packet.key < 0)
         packet.key = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch()/1000.;
     emit plotRequest(packet);
 }
 
-void BuiltInDebug::plot(const string &name, double value, double key, const string &category)
+void BuiltInDebugger::plot(const string &name, double value, double key, const string &category)
 {
     if(key < 0)
         key = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch()/1000.;
@@ -49,12 +49,12 @@ void BuiltInDebug::plot(const string &name, double value, double key, const stri
     emit plotRequest(packet);
 }
 
-void BuiltInDebug::scatter(ScatterPacket &packet)
+void BuiltInDebugger::scatter(ScatterPacket &packet)
 {
     scatterRequest(packet);
 }
 
-void BuiltInDebug::scatter(double x, double y, string name, const string &category)
+void BuiltInDebugger::scatter(double x, double y, string name, const string &category)
 {
     ScatterPacket packet;
     packet.x = x;
@@ -62,6 +62,36 @@ void BuiltInDebug::scatter(double x, double y, string name, const string &catego
     packet.name = category;
     packet.legend = name;
     scatterRequest(packet);
+}
+
+PlotterWidget *BuiltInDebugger::getPlotter(const string &name)
+{
+    PlotterWidget *widget;
+    auto itr = plotterMap.find(name);
+    if(itr == plotterMap.end()) {
+        widget = new PlotterWidget();
+        widget->setParent(this->widgets_manager);
+        widgets_manager->addPlotter(QString::fromStdString(name), widget);
+        plotterMap.insert(make_pair(name, widget));
+    }
+    else
+        widget = static_cast<PlotterWidget*>(itr->second);
+    return widget;
+}
+
+ScatterWidget *BuiltInDebugger::getScatter(const string &name)
+{
+    ScatterWidget *widget = NULL;
+    auto itr = scatterMap.find(name);
+    if(itr == scatterMap.end()) {
+        widget = new ScatterWidget();
+        widget->setParent(widgets_manager);
+        widgets_manager->addScatter(QString::fromStdString(name), widget);
+        scatterMap.insert(make_pair(name, widget));
+    }
+    else
+        widget = static_cast<ScatterWidget*>(itr->second);
+    return widget;
 }
 
 

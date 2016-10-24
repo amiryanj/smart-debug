@@ -1,8 +1,10 @@
-#ifndef DEBUGFACTORY_H
-#define DEBUGFACTORY_H
+#ifndef _DEBUGFACTORY_H
+#define _DEBUGFACTORY_H
 
 #include "debugger.h"
-//#include "networkplotter.h"
+#include "plotterwidget.h"
+#include "scatterwidget.h"
+#include <map>
 
 namespace dbug {
 
@@ -11,19 +13,18 @@ namespace dbug {
     class DebugFactory
     {
     public:
-
         enum DebuggerStyle{eBuiltInDebugger, eNetworkDebugger};
+
+        static Debugger* createDebugger(DebuggerStyle style = eBuiltInDebugger, QWidget *parent = 0);
+        static Debugger* debugger();
+        static DebuggerStyle getDebuggerStyle();
+        static void clearDebugger();
 
     protected:
         static DebuggerStyle sDebuggerStyle;
         static Debugger*     sDebugger;
-
-    public:
-        static Debugger* createDebugger(DebuggerStyle style = eBuiltInDebugger, QWidget *parent = 0);
-        static Debugger* debugger();
-        static DebuggerStyle getDebuggerStyle();
-
-        static void clearDebugger();
+        static std::map<std::string, PlotterWidget*> plotterMap;
+        static std::map<std::string, ScatterWidget*> scatterMap;
     };
 
 }
