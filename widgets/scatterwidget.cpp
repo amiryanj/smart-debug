@@ -10,35 +10,22 @@
 
 #include "scatterwidget.h"
 #include "ui_scatterwidget.h"
-namespace dbug {
+
+using namespace std;
+
+namespace dbug
+{
 
 ScatterWidget::ScatterWidget() :
     ui(new Ui::ScatterWidget)
 {
-    ui->setupUi(this);
-
-    // ----------------------- Scatter Configuration ---------------------------
-    ui->scatter->addGraph(); // blue circle
-    ui->scatter->graph(0)->setPen(QPen(Qt::blue));
-    ui->scatter->graph(0)->setLineStyle(QCPGraph::lsNone);
-    ui->scatter->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
-
-    ui->scatter->addGraph(); // blue line
-    ui->scatter->graph(1)->setPen(QPen(Qt::red));
-    ui->scatter->graph(1)->setLineStyle(QCPGraph::lsNone);
-    ui->scatter->graph(1)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 5));
-
-    ui->scatter->addGraph(); // blue line
-    ui->scatter->graph(2)->setPen(QPen(Qt::green));
-    ui->scatter->graph(2)->setLineStyle(QCPGraph::lsNone);
-    ui->scatter->graph(2)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 30));
-
+    ui->setupUi(this);    
 
     ui->scatter->xAxis->setTickStep(2);
     ui->scatter->axisRect()->setupFullAxesBox();
     ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
-    ui->scatter->xAxis->setRange(-100, 100);
-    ui->scatter->yAxis->setRange(-100, 100);
+    ui->scatter->xAxis->setRange(-1, 1);
+    ui->scatter->yAxis->setRange(-1, 1);
 
     // make left and bottom axes transfer their ranges to right and top axes:
     connect(ui->scatter->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->scatter->xAxis2, SLOT(setRange(QCPRange)));
@@ -53,34 +40,65 @@ ScatterWidget::~ScatterWidget()
     delete ui;
 }
 
-void ScatterWidget::setData(const QVector<QPoint> &data)
+void ScatterWidget::addPacket(const ScatterPacket &packet)
 {
-    QVector<double> x;
-    QVector<double> y;
-    foreach (QPoint point, data) {
-        x.append(point.x());
-        y.append(point.y());
+    QCPGraph *graph = NULL;
+    for(int j=0; j<ui->scatter->legend->itemCount(); j++)
+    {
+        if(ui->scatter->graph(j)->name() == QString::fromStdString(packet.legend))
+        {
+            graph = ui->scatter->graph(j);
+            break;
+        }
     }
-    ui->scatter->graph(0)->setData(x, y);
 
+    if(!graph)
+    {
+        graph = ui->scatter->addGraph();
+        // ----------------------- Scatter Configuration ---------------------------
+        graph->setName(QString::fromStdString(packet.legend));
+        graph->setPen(QPen((Qt::GlobalColor)(ui->scatter->graphCount()%13+6)));
+        graph->setLineStyle(QCPGraph::lsNone);
+        graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
+        ui->scatter->legend->setVisible(true);
+    }
+
+    graph->addData(packet.point.x, packet.point.y);
     ui->scatter->replot();
+
+    if(ui->recButton->isChecked())
+    {
+        vector<double> vec2_double(2);
+        vec2_double[0] = packet.point.x;
+        vec2_double[1] = packet.point.y;
+        vector<string> vec2_string(2);
+        vec2_string[0] = packet.legend + "_x";
+        vec2_string[1] = packet.legend + "_y";
+        logger.addLogCsv(graph->data()->count(), vec2_string, vec2_double);
+    }
 }
 
-void ScatterWidget::addData(const QPointF &p)
+void ScatterWidget::addData(float x, float y, string legend)
 {
-    ui->scatter->graph(0)->addData(p.x(), p.y());
-
-    QVector<double> x;
-    QVector<double> y;
-    x.append(p.x());
-    y.append(p.y());
-    ui->scatter->graph(1)->setData(x, y);
-    ui->scatter->replot();
+    addData(Point(x, y), legend);
 }
 
-void ScatterWidget::addData(float x, float y)
+void ScatterWidget::addData(const Point &point, string legend)
 {
-    this->addData(QPoint(x, y));
+    ScatterPacket packet;
+    packet.point = point;
+    packet.legend = legend;
+    addPacket(packet);
+}
+
+void ScatterWidget::setData(const std::vector<Point> &data, string legend)
+{
+    ScatterPacket packet;
+    packet.legend = legend;
+    for(unsigned int i=0; i<data.size(); i++) {
+        packet.point = data[i];
+        addPacket(packet);
+    }
 }
 
 void ScatterWidget::clearData()

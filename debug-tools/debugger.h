@@ -36,7 +36,6 @@ namespace dbug {
 
         virtual Plotter* getPlotter(const std::string &name) { (void) name; }
         virtual Scatter* getScatter(const std::string &name) { (void) name; }
-        virtual Logger*  getLogger (const std::string &name) { (void) name; }
 
     };
 

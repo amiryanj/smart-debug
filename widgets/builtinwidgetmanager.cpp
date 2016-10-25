@@ -9,7 +9,7 @@
 //========================================================================
 
 #include "builtinwidgetmanager.h"
-#include "ui_widgetsmanager.h"
+#include "ui_builtinwidgetmanager.h"
 #include "plotterwidget.h"
 #include "scatterwidget.h"
 #include "logger.h"
@@ -126,16 +126,17 @@ void BuiltInWidgetManager::on_saveToButton_clicked()
 void BuiltInWidgetManager::on_recordButton_clicked(bool checked)
 {
     if(checked) {
-        bool res = Logger::getInstance()->setLogDir(ui->saveToDirLineEdit->text());
+        bool res = Logger::setLogDir(ui->saveToDirLineEdit->text().toStdString());
+        Logger::startTimer(3000);
         if(res) {
-            ui->saveToFileLabel->setText("/" + Logger::getInstance()->getFileInfo().fileName());
+            ui->saveToFileLabel->setText(QString::fromStdString(Logger::getLogDir()));
         }
         else {
 
         }
     }
     else {
-
+        Logger::stopTimer();
     }
 
 }

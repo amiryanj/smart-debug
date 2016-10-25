@@ -10,6 +10,7 @@
 #ifndef _PLOTTER_H
 #define _PLOTTER_H
 
+#include "logger.h"
 #include <vector>
 #include <string>
 #include <cstdio>
@@ -38,11 +39,17 @@ public:
 
 class Plotter
 {
+protected:
+    Logger logger;
+    std::string category;
+
 public:
-    Plotter();
+    Plotter() {}
 
     virtual void addValue(double val, double key = -1, std::string legend = "") =0;
     virtual void addPacket(const PlotterPacket& packet) =0;
+    virtual void setCategory(const std::string &category_);
+    std::string getCategory() const;
 };
 
 }

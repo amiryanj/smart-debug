@@ -20,7 +20,6 @@ PlotterWidget::PlotterWidget() :
     statusGItem->setOffset(-w/2, -h/2);
     statusGItem->setPos(w/2, h/2);
 
-
     // Add Drag, Zoom and ... capabilities
     ui->qPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
 
@@ -32,8 +31,6 @@ PlotterWidget::PlotterWidget() :
     connect(ui->qPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(graphClicked(QCPAbstractPlottable*)));
 
     // ************* Set Axis Settings ****************
-    ui->qPlot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
-    //ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
     ui->qPlot->xAxis->setAutoTickStep(true);
     ui->qPlot->xAxis->setTickStep(1);
     ui->qPlot->xAxis->setTickLabelRotation(30);
@@ -44,10 +41,10 @@ PlotterWidget::PlotterWidget() :
     freezed = false;
 }
 
-void PlotterWidget::setName(QString name)
+void PlotterWidget::setCategory(const string &category_)
 {
-    this->plotName = name;
-    ui->minimizeButton->setToolTip("Plot: " + name);
+    ui->minimizeButton->setToolTip(QString("Plot: %1").arg(category_.c_str()));
+    Plotter::setCategory(category_);
 }
 
 void PlotterWidget::setLegendsFont(const QFont& font)
@@ -59,24 +56,20 @@ void PlotterWidget::setLegendsFont(const QFont& font)
 
 void PlotterWidget::addPacket(const PlotterPacket &packet)
 {
-
-}
-
-void PlotterWidget::addValue(double key, const QVector<double> &vals, const QVector<QString> &legends)
-{
     if(!this->connected)
         return;
 
-    // ************* Adding New Graph *****************
-    static QVector<QColor> colorList {Qt::green, Qt::red, Qt::magenta, Qt::blue, Qt::darkGreen, Qt::darkYellow, Qt::darkRed};
-    int n = vals.size();
+    double key = packet.key;
+    if(key < 0)
+        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0 ;
 
-    for(int i=0; i<legends.size(); i++)
+    // ************* Adding New Graph *****************
+    for(unsigned int i=0; i<packet.legends.size(); i++)
     {
         QCPGraph *g1 = NULL, *g2 = NULL;
         for(int j=0; j<ui->qPlot->legend->itemCount(); j++)
         {
-            if(ui->qPlot->graph(2*j)->name() == legends[i])
+            if(ui->qPlot->graph(2*j)->name() == QString::fromStdString(packet.legends[i]))
             {
                 g1 = ui->qPlot->graph(2*j);
                 g2 = ui->qPlot->graph(2*j +1);
@@ -86,73 +79,60 @@ void PlotterWidget::addValue(double key, const QVector<double> &vals, const QVec
 
         if(!g1 && !g2)
         {
-            int k = ui->qPlot->graphCount();
             g1 = ui->qPlot->addGraph();
-            g2 = ui->qPlot->addGraph();
-
-            g1->setName(legends[i]);
-
-            g1->setPen(colorList[(k/2)%colorList.size()]);
+            g2 = ui->qPlot->addGraph(); // Add a blue dot in end of graph
             ui->qPlot->legend->removeItem(ui->qPlot->legend->itemCount()-1); // don't show two graphs in legend
 
-            // Add a blue dot in end of graph
+            int count = ui->qPlot->graphCount();
+            g1->setName(QString::fromStdString(packet.legends[i]));
+            g1->setPen(QPen((Qt::GlobalColor)((count/2)%13+6)));
+
             g2->setPen(QPen(Qt::blue));
             g2->setLineStyle(QCPGraph::lsNone);
             g2->setScatterStyle(QCPScatterStyle::ssDisc);
-        }
+            ui->qPlot->legend->setVisible(true);
+
+            if(key > QDateTime::currentMSecsSinceEpoch()/2000) {
+                ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
+                ui->qPlot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+            }
+            else {
+                ui->qPlot->xAxis->setNumberFormat("f");
+                ui->qPlot->xAxis->setTickLabelType(QCPAxis::ltNumber);
+            }
+        }        
 
         //! add data to lines:
-        g1->addData(key, vals[i]);
-        //g1->removeDataBefore(key-120);  // delete memory after 2 minutes
+        g1->addData(key, packet.values[i]);
         g2->clearData();
-        g2->addData(key, vals[i]);
+        g2->addData(key, packet.values[i]);
 
-        double upper_bound = qMax(vals[i] , ui->qPlot->yAxis->range().upper) ;
-        double lower_bound = qMin(vals[i] , ui->qPlot->yAxis->range().lower) ;
-        ui->qPlot->yAxis->setRangeUpper(upper_bound);
-        ui->qPlot->yAxis->setRangeLower(lower_bound);
-
-        if(key > QDateTime::currentMSecsSinceEpoch()/2)
-            ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
-
-        // ui->qPlot->yAxis->setRangeUpper(-3000);
-        // ui->qPlot->yAxis->setRangeLower(3000);
+        if(!freezed) {
+            double upper_bound = qMax(packet.values[i] , ui->qPlot->yAxis->range().upper) ;
+            double lower_bound = qMin(packet.values[i] , ui->qPlot->yAxis->range().lower) ;
+            ui->qPlot->yAxis->setRangeUpper(upper_bound);
+            ui->qPlot->yAxis->setRangeLower(lower_bound);
+        }
     }
 
-    // make key axis range scroll with the data (at a constant range size of 8):
     if(!freezed)
         ui->qPlot->xAxis->setRange(key+4, 20, Qt::AlignRight);
-    ui->qPlot->replot();
+    //ui->qPlot->replot();
+
+    if(ui->recButton->isChecked()) {
+        logger.addLogCsv(key, packet.legends, packet.values);
+    }
 
     if(statusGItem->isVisible())
         statusGItem->setRotation(statusGItem->rotation()-5);
-
-    //! calculate frames per second:
-    /*
-    static double lastFpsKey;
-    static int frameCount;
-    frameCount ++;
-    if (key-lastFpsKey > 2) // average fps over 2 seconds
-    {
-        lastFpsKey = key;
-        frameCount = 0;
-    }
-    */
-
 }
 
 void PlotterWidget::addValue(double val, double key, string legend)
 {
-    if(key < 0)
-        key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0 ;
+    PlotterPacket packet(legend, val);
+    packet.setKey(key);
 
-    QVector<double> valVector(1, val);
-    QVector<QString> legVector(1, QString::fromStdString(legend));
-    addValue(key, valVector, legVector);
-
-    //    static int cntr = 0;
-    //    cntr ++;
-    //    addValue(cntr, val);
+    addPacket(packet);
 }
 
 void PlotterWidget::forceToPause()
@@ -258,7 +238,7 @@ void PlotterWidget::graphClicked(QCPAbstractPlottable *plottable)
 
 void PlotterWidget::on_closeButton_clicked()
 {
-    emit closeMe(this->plotName);
+    emit closeMe(QString::fromStdString(this->category));
 }
 
 void PlotterWidget::on_minimizeButton_clicked(bool checked)

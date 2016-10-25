@@ -27,10 +27,10 @@ public:
     explicit ScatterWidget();
     ~ScatterWidget();
 
-    void setData(const QVector<QPoint> &data);
-    virtual void addPacket(const ScatterPacket& packet) {}
-    void addData(const QPointF &p);
-    void addData(float x, float y);
+    void addPacket(const ScatterPacket& packet);
+    void addData(float x, float y, std::string legend = "Unknown");
+    void addData(const Point &point, std::string legend = "Unknown");
+    void setData(const std::vector<Point> &data, std::string legend = "Unknown");
     void clearData();
 
     void mouseWheel();

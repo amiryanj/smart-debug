@@ -57,8 +57,8 @@ void BuiltInDebugger::scatter(ScatterPacket &packet)
 void BuiltInDebugger::scatter(double x, double y, string name, const string &category)
 {
     ScatterPacket packet;
-    packet.x = x;
-    packet.y = y;
+    packet.point.x = x;
+    packet.point.y = y;
     packet.name = category;
     packet.legend = name;
     scatterRequest(packet);
@@ -70,6 +70,7 @@ PlotterWidget *BuiltInDebugger::getPlotter(const string &name)
     auto itr = plotterMap.find(name);
     if(itr == plotterMap.end()) {
         widget = new PlotterWidget();
+        widget->setCategory(name);
         widget->setParent(this->widgets_manager);
         widgets_manager->addPlotter(QString::fromStdString(name), widget);
         plotterMap.insert(make_pair(name, widget));
@@ -85,6 +86,7 @@ ScatterWidget *BuiltInDebugger::getScatter(const string &name)
     auto itr = scatterMap.find(name);
     if(itr == scatterMap.end()) {
         widget = new ScatterWidget();
+        widget->setCategory(name);
         widget->setParent(widgets_manager);
         widgets_manager->addScatter(QString::fromStdString(name), widget);
         scatterMap.insert(make_pair(name, widget));

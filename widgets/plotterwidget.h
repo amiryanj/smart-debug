@@ -18,14 +18,13 @@ public:
     explicit PlotterWidget();
     ~PlotterWidget();
 
-    void setName(QString name);
+    void setCategory(const string &category_);
     void setLegendsFont(const QFont &font);
 
 public slots:
-    void addValue(double val, double key = -1, std::string legend = "");
     void addPacket(const PlotterPacket &packet);
+    void addValue(double val, double key = -1, std::string legend = "");
 
-    void addValue(double key, const QVector<double> &vals, const QVector<QString> &legends);
     void forceToPause();
     void forceToPlay();
     void setConnected(bool connected);
@@ -49,7 +48,6 @@ private:
     Ui::PlotterWidget *ui;
     QGraphicsPixmapItem* statusGItem;
 
-    QString plotName;
     bool connected;
     bool freezed;
 };

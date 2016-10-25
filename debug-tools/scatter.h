@@ -10,30 +10,41 @@
 #ifndef _SCATTER_H
 #define _SCATTER_H
 
+#include "logger.h"
 #include <string>
 
 namespace dbug {
 
+struct Point {
+    Point() {}
+    Point(double x_, double y_): x(x_), y(y_) { }
+    double x, y;
+};
+
 class ScatterPacket
 {
 public:
-    ScatterPacket() {}
-    double x, y;
+    ScatterPacket():name("general") {}
+    Point point;
     std::string legend;
     std::string name; // category
 };
 
 class Scatter
 {
-public:
-    Scatter();
+protected:
+    Logger logger;
+    std::string category;
 
-    virtual void addData(float x, float y) = 0;
+public:
+    Scatter() {}
+
     virtual void addPacket(const ScatterPacket& packet) = 0;
-    //virtual void addData(const QPointF &p);
-    //virtual void setData(const vector<QPoint> &data);
+    virtual void addData(float x, float y, std::string legend = "Unknown") = 0;
+    virtual void setData(const std::vector<Point> &data, std::string legend = "Unknown") = 0;
     virtual void clearData() = 0;
-    //virtual void setName(const std::string &name) = 0;
+    std::string getCategory() const;
+    void setCategory(const std::string &category_);
 };
 
 
