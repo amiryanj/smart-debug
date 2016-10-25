@@ -108,6 +108,11 @@ void ScatterWidget::clearData()
     ui->scatter->replot();
 }
 
+void ScatterWidget::enableRecording(bool enable)
+{
+    ui->recButton->setChecked(enable);
+}
+
 void ScatterWidget::mouseWheel()
 {
     // if an axis is selected, only allow the direction of that axis to be zoomed

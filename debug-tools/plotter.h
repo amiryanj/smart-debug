@@ -49,6 +49,7 @@ public:
     virtual void addValue(double val, double key = -1, std::string legend = "") =0;
     virtual void addPacket(const PlotterPacket& packet) =0;
     virtual void setCategory(const std::string &category_);
+    virtual void enableRecording(bool enable) {}
     std::string getCategory() const;
 };
 

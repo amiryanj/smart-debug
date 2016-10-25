@@ -20,6 +20,7 @@ public:
 
     void setCategory(const string &category_);
     void setLegendsFont(const QFont &font);
+    void enableRecording(bool enable);
 
 public slots:
     void addPacket(const PlotterPacket &packet);

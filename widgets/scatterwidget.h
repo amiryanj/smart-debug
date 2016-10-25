@@ -32,6 +32,8 @@ public:
     void addData(const Point &point, std::string legend = "Unknown");
     void setData(const std::vector<Point> &data, std::string legend = "Unknown");
     void clearData();
+    void enableRecording(bool enable);
+
 
     void mouseWheel();
 

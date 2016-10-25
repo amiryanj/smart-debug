@@ -51,7 +51,12 @@ void PlotterWidget::setLegendsFont(const QFont& font)
 {
     ui->qPlot->legend->setVisible(true);
     ui->qPlot->legend->setFont(font);
-    ui->qPlot->legend->setRowSpacing(-3);    
+    ui->qPlot->legend->setRowSpacing(-3);
+}
+
+void PlotterWidget::enableRecording(bool enable)
+{
+    ui->recButton->setChecked(enable);
 }
 
 void PlotterWidget::addPacket(const PlotterPacket &packet)

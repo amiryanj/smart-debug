@@ -43,8 +43,9 @@ public:
     virtual void addData(float x, float y, std::string legend = "Unknown") = 0;
     virtual void setData(const std::vector<Point> &data, std::string legend = "Unknown") = 0;
     virtual void clearData() = 0;
+    virtual void enableRecording(bool enable) {}
+    virtual void setCategory(const std::string &category_);
     std::string getCategory() const;
-    void setCategory(const std::string &category_);
 };
 
 
