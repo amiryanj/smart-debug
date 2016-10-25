@@ -16,12 +16,18 @@ PlotterWidget::PlotterWidget() :
     statusScene->setSceneRect(0, 0, w, h);
     ui->statusGraphicsView->scale(ui->statusGraphicsView->maximumWidth()/w, ui->statusGraphicsView->maximumWidth()/h);
 
+    // connect slot that ties some axis selections together (especially opposite axes):
+    connect(ui->qPlot, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
+    // connect slots that takes care that when an axis is selected, only that direction can be dragged and zoomed:
+    connect(ui->qPlot, &QCustomPlot::mousePress, this, &PlotterWidget::mousePress);
+    connect(ui->qPlot, &QCustomPlot::mouseWheel, this, &PlotterWidget::mouseWheel);
+
     statusGItem = statusScene->addPixmap(pixmap);
     statusGItem->setOffset(-w/2, -h/2);
     statusGItem->setPos(w/2, h/2);
 
     // Add Drag, Zoom and ... capabilities
-    ui->qPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
+    ui->qPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems | QCP::iSelectPlottables | QCP::iSelectAxes);
 
     // make bottom and left axes transfer their ranges to top and right axes:
     connect(ui->qPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->qPlot->xAxis2, SLOT(setRange(QCPRange)));
@@ -113,8 +119,8 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
         g2->addData(key, packet.values[i]);
 
         if(!freezed) {
-            double upper_bound = qMax(packet.values[i] , ui->qPlot->yAxis->range().upper) ;
-            double lower_bound = qMin(packet.values[i] , ui->qPlot->yAxis->range().lower) ;
+            double upper_bound = qMax(packet.values[i], ui->qPlot->yAxis->range().upper);
+            double lower_bound = qMin(packet.values[i], ui->qPlot->yAxis->range().lower);
             ui->qPlot->yAxis->setRangeUpper(upper_bound);
             ui->qPlot->yAxis->setRangeLower(lower_bound);
         }
@@ -122,7 +128,7 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
 
     if(!freezed)
         ui->qPlot->xAxis->setRange(key+4, 20, Qt::AlignRight);
-    //ui->qPlot->replot();
+    ui->qPlot->replot();
 
     if(ui->recButton->isChecked()) {
         logger.addLogCsv(key, packet.legends, packet.values);
@@ -201,7 +207,7 @@ void PlotterWidget::selectionChanged()
     {
         QCPGraph *graph = ui->qPlot->graph(i);
         QCPPlottableLegendItem *item = ui->qPlot->legend->itemWithPlottable(graph);
-        if (item->selected() || graph->selected())
+        if (item && (item->selected() || graph->selected()))
         {
             item->setSelected(true);
             graph->setSelected(true);
@@ -213,7 +219,6 @@ void PlotterWidget::mousePress()
 {
     // if an axis is selected, only allow the direction of that axis to be dragged
     // if no axis is selected, both directions may be dragged
-
     if (ui->qPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
         ui->qPlot->axisRect()->setRangeDrag(ui->qPlot->xAxis->orientation());
     else if (ui->qPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
@@ -226,7 +231,6 @@ void PlotterWidget::mouseWheel()
 {
     // if an axis is selected, only allow the direction of that axis to be zoomed
     // if no axis is selected, both directions may be zoomed
-
     if (ui->qPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
         ui->qPlot->axisRect()->setRangeZoom(ui->qPlot->xAxis->orientation());
     else if (ui->qPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))

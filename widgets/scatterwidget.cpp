@@ -31,8 +31,14 @@ ScatterWidget::ScatterWidget() :
     connect(ui->scatter->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->scatter->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->scatter->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->scatter->yAxis2, SLOT(setRange(QCPRange)));
 
+    // connect slot that ties some axis selections together (especially opposite axes):
+    connect(ui->scatter, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
+    // connect slots that takes care that when an axis is selected, only that direction can be dragged and zoomed:
+    connect(ui->scatter, &QCustomPlot::mousePress, this, &ScatterWidget::mousePress);
+    connect(ui->scatter, &QCustomPlot::mouseWheel, this, &ScatterWidget::mouseWheel);
+
     // Add Drag, Zoom and ... capabilities
-    ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems);
+    ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems | QCP::iSelectPlottables | QCP::iSelectAxes);
 }
 
 ScatterWidget::~ScatterWidget()
@@ -64,6 +70,16 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
     }
 
     graph->addData(packet.point.x, packet.point.y);
+    //if(packet.point.x > ui->scatter->xAxis->max)
+
+    double max_x = qMax(packet.point.x, ui->scatter->xAxis->range().upper);
+    double min_x = qMin(packet.point.x, ui->scatter->xAxis->range().lower);
+    double max_y = qMax(packet.point.y, ui->scatter->yAxis->range().upper);
+    double min_y = qMin(packet.point.y, ui->scatter->yAxis->range().lower);
+
+    ui->scatter->xAxis->setRange(min_x, max_x);
+    ui->scatter->yAxis->setRange(min_y, max_y);
+
     ui->scatter->replot();
 
     if(ui->recButton->isChecked())
@@ -113,11 +129,65 @@ void ScatterWidget::enableRecording(bool enable)
     ui->recButton->setChecked(enable);
 }
 
+void ScatterWidget::selectionChanged()
+{
+    /*
+   normally, axis base line, axis tick labels and axis labels are selectable separately, but we want
+   the user only to be able to select the axis as a whole, so we tie the selected states of the tick labels
+   and the axis base line together. However, the axis label shall be selectable individually.
+
+   The selection state of the left and right axes shall be synchronized as well as the state of the
+   bottom and top axes.
+
+   Further, we want to synchronize the selection of the graphs with the selection state of the respective
+   legend item belonging to that graph. So the user can select a graph by either clicking on the graph itself
+   or on its legend item.
+   */
+
+    // make top and bottom axes be selected synchronously, and handle axis and tick labels as one selectable object:
+    if (ui->scatter->xAxis->selectedParts().testFlag(QCPAxis::spAxis) || ui->scatter->xAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
+            ui->scatter->xAxis2->selectedParts().testFlag(QCPAxis::spAxis) || ui->scatter->xAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+    {
+        ui->scatter->xAxis2->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+        ui->scatter->xAxis->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+    }
+    // make left and right axes be selected synchronously, and handle axis and tick labels as one selectable object:
+    if (ui->scatter->yAxis->selectedParts().testFlag(QCPAxis::spAxis) || ui->scatter->yAxis->selectedParts().testFlag(QCPAxis::spTickLabels) ||
+            ui->scatter->yAxis2->selectedParts().testFlag(QCPAxis::spAxis) || ui->scatter->yAxis2->selectedParts().testFlag(QCPAxis::spTickLabels))
+    {
+        ui->scatter->yAxis2->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+        ui->scatter->yAxis->setSelectedParts(QCPAxis::spAxis|QCPAxis::spTickLabels);
+    }
+
+    // synchronize selection of graphs with selection of corresponding legend items:
+    for (int i=0; i<ui->scatter->graphCount(); ++i)
+    {
+        QCPGraph *graph = ui->scatter->graph(i);
+        QCPPlottableLegendItem *item = ui->scatter->legend->itemWithPlottable(graph);
+        if (item && (item->selected() || graph->selected()))
+        {
+            item->setSelected(true);
+            graph->setSelected(true);
+        }
+    }
+}
+
+void ScatterWidget::mousePress()
+{
+    // if an axis is selected, only allow the direction of that axis to be dragged
+    // if no axis is selected, both directions may be dragged
+    if (ui->scatter->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        ui->scatter->axisRect()->setRangeDrag(ui->scatter->xAxis->orientation());
+    else if (ui->scatter->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        ui->scatter->axisRect()->setRangeDrag(ui->scatter->yAxis->orientation());
+    else
+        ui->scatter->axisRect()->setRangeDrag(Qt::Horizontal|Qt::Vertical);
+}
+
 void ScatterWidget::mouseWheel()
 {
     // if an axis is selected, only allow the direction of that axis to be zoomed
     // if no axis is selected, both directions may be zoomed
-
     if (ui->scatter->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
         ui->scatter->axisRect()->setRangeZoom(ui->scatter->xAxis->orientation());
     else if (ui->scatter->yAxis->selectedParts().testFlag(QCPAxis::spAxis))

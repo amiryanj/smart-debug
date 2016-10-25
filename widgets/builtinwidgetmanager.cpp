@@ -126,21 +126,13 @@ void BuiltInWidgetManager::on_saveToButton_clicked()
 void BuiltInWidgetManager::on_recordButton_clicked(bool checked)
 {
     if(checked) {
-        bool res = Logger::setLogDir(ui->saveToDirLineEdit->text().toStdString());
+        Logger::setLogDir(ui->saveToDirLineEdit->text().toStdString());
         Logger::startTimer(3000);
-        if(res) {
-            ui->saveToFileLabel->setText(QString::fromStdString(Logger::getLogDir()));
-        }
-        else {
-
-        }
     }
     else {
         Logger::stopTimer();
     }
-
 }
-
 
 void BuiltInWidgetManager::on_palyButton_clicked()
 {

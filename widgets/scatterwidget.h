@@ -34,7 +34,9 @@ public:
     void clearData();
     void enableRecording(bool enable);
 
-
+private slots:
+    void selectionChanged();
+    void mousePress();
     void mouseWheel();
 
     

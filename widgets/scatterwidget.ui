@@ -32,16 +32,16 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="leftMargin">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="topMargin">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="rightMargin">
-      <number>2</number>
+      <number>1</number>
      </property>
      <property name="bottomMargin">
-      <number>2</number>
+      <number>1</number>
      </property>
      <item>
       <widget class="QToolButton" name="recButton">
@@ -51,6 +51,12 @@
        <property name="icon">
         <iconset resource="../resources/icons.qrc">
          <normaloff>:/png-icons/media-collection/multimedia.png</normaloff>:/png-icons/media-collection/multimedia.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
        </property>
        <property name="checkable">
         <bool>true</bool>
