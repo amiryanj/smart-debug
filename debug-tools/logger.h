@@ -1,50 +1,46 @@
 #ifndef _LOGGER_H
 #define _LOGGER_H
 
+#include <mutex>
 #include <string>
+#include <fstream>
 #include <iostream>
-#include <QMap>
-#include <QFile>
-#include <QMutex>
 #include <QTimer>
-#include <QDateTime>
-#include <QString>
-#include <QObject>
-#include <QVector>
-#include <QDir>
 
 class Logger : public QObject
 {
     Q_OBJECT
 
-    QMutex mtx_;
-    static Logger* instance;
-    static const std::string path;
-    Logger();
-    ~Logger();    
-    QTimer timer;
+    static std::string log_dir;
+    static QTimer timer;
+    mutable std::mutex mtx_;
+    std::string logFileName;
+    std::ofstream logFile;
+
+    std::map<double, std::vector<std::string> > jsonLogMap;
+
+    std::vector<std::string> csvColumnTitles;
+    std::map<double, std::map<std::string, double> > csvLogMap;
 
 public:
-    static Logger* getInstance();
+    Logger();
+    ~Logger();
+    static bool setLogDir(const std::string &dir);
+    static std::string getLogDir();
+    static void startTimer(int interval, Qt::TimerType timerType = Qt::VeryCoarseTimer);
+    static void stopTimer();
 
-    bool setLogDir(const QString &dir);
+    std::string getFileName() const;
+    void setFileName(const std::string &file_name);
 
-    QFileInfo getFileInfo() const;
-
-    QDir log_dir;
-    QFile log_file;
-    QMap<double, QVector<QString> > logsMap;
-
+    void addLogCsv(double key, const std::vector<std::string> &legends, std::vector<double> vals);
     void addLogJson(double key, const std::string& str);
-    void writeToFile(double key, const QVector<QString> &data);
+    void writeToJsonFile(double key, const std::vector<std::string> &data);
+    //void writeToCsvFile(double key, const QVector<QString> &data);
 
 private slots:
-    void saveToFile();
-
-
-
-
-
+    void persistJsonLogs();
+    void persistCsvLogs();
 
 };
 

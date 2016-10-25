@@ -4,83 +4,168 @@
 #include <fstream>
 #include <cstdio>
 
-const std::string Logger::path = "../../logs/";
-Logger* Logger::instance = NULL;
+using namespace std;
+
+string Logger::log_dir;
+QTimer Logger::timer;
 
 Logger::Logger()
 {
-    connect(&timer, &QTimer::timeout, this, &Logger::saveToFile);
+    connect(&timer, &QTimer::timeout, this, &Logger::persistCsvLogs);
 }
 
 Logger::~Logger()
 {
 }
 
-Logger *Logger::getInstance()
+bool Logger::setLogDir(const string &dir)
 {
-    if(instance == NULL)
-        instance = new Logger;
-    return instance;
-}
-
-bool Logger::setLogDir(const QString &dir)
-{
-    log_dir.setPath(dir);
-    if(!log_dir.mkpath(log_dir.absolutePath()))
+    if(dir.empty())
         return false;
-    QFileInfo file_info;
-    QString file_name = QString("log_%1.json").arg(QDateTime::currentDateTime().toString("d|MMM|yyyy_hh-mm"));
-    file_info.setFile(log_dir, file_name);
-    log_file.setFileName(file_info.absoluteFilePath());
-    timer.start(3000);
+    if(dir.back() != '/')
+        log_dir = dir;
+    log_dir.append("/");
+#ifdef WIN32
+    if(!CreateDirectory(log_dir.c_str(), NULL))
+        return false;
+#else
+    char command[255];
+    sprintf(command, "mkdir -p %s", log_dir.c_str());
+    system(command);
+#endif
     return true;
 }
 
-QFileInfo Logger::getFileInfo() const
+string Logger::getLogDir()
 {
-    return QFileInfo(log_file.fileName());
+    return log_dir;
+}
+
+void Logger::startTimer(int interval, Qt::TimerType timerType)
+{
+    timer.setTimerType(timerType);
+    timer.start(interval);
+}
+
+void Logger::stopTimer()
+{
+    timer.stop();
+}
+
+string Logger::getFileName() const
+{
+    return logFileName;
+}
+
+void Logger::setFileName(const string &file_name)
+{
+    logFileName = file_name;
+}
+
+void Logger::addLogCsv(double key, const std::vector<std::string> &legends, std::vector<double> vals)
+{
+    Q_ASSERT(legends.size() == vals.size());
+
+    mtx_.lock();
+    for(unsigned int i=0; i<legends.size(); i++) {
+        if(std::find(csvColumnTitles.begin(), csvColumnTitles.end(), legends[i]) == csvColumnTitles.end())
+            csvColumnTitles.push_back(legends[i]);
+        csvLogMap[key][legends[i]] = vals[i];
+    }
+    mtx_.unlock();
 }
 
 void Logger::addLogJson(double key, const std::string &str)
 {
     mtx_.lock();
-    logsMap[key].push_back(QString::fromStdString(str));
+    jsonLogMap[key].push_back(str);
     mtx_.unlock();
 }
 
-void Logger::saveToFile()
+void Logger::persistJsonLogs()
 {
-    while(logsMap.size() > 1)
+    while(!jsonLogMap.empty())
     {
-        double first_key = logsMap.firstKey();
-        QVector<QString> first_vec = logsMap.first();
+        double first_key = jsonLogMap.begin()->first;
+        vector<string> first_vec = jsonLogMap.begin()->second;
+        writeToJsonFile(first_key, first_vec);
         mtx_.lock();
-        logsMap.remove(first_key);
+        jsonLogMap.erase(first_key);
         mtx_.unlock();
-        writeToFile(first_key, first_vec);
     }
 }
 
-void Logger::writeToFile(double key, const QVector<QString> &data)
+void Logger::persistCsvLogs()
 {
+    while(!csvLogMap.empty() && !csvColumnTitles.empty())
+    {
+        double first_key = csvLogMap.begin()->first;
+        map<string, double> first_val = csvLogMap.begin()->second;
 
-    if(log_file.isOpen() || log_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+        if(!logFile.is_open()) {
+            cout << logFileName << endl;
+            logFile.open(log_dir + logFileName, ios::out | ios::app | ios::ate);
+            //if(logFile.pos() != 0)
+            {
+                /// write csv header
+                logFile << "key, ";
+                for(unsigned int i=0; i<csvColumnTitles.size(); i++) {
+                    logFile << csvColumnTitles[i];
+                    if(i!=csvColumnTitles.size()-1)
+                        logFile << ", ";
+                    else
+                        logFile << "\n";
+                }
+            }
+        }
+
+        if(logFile.is_open())
+        {
+            logFile << first_key << ", ";
+            for(unsigned int i=0; i<csvColumnTitles.size(); i++)
+            {
+                string col = csvColumnTitles[i];
+                if(first_val.find(col) != first_val.end())
+                    logFile << std::to_string(first_val[col]).c_str();
+                else
+                    logFile << "nan";
+                if(i!=csvColumnTitles.size()-1)
+                    logFile << ", ";
+                else
+                    logFile << "\n";
+            }
+            logFile.flush();
+        }
+
+        mtx_.lock();
+        csvLogMap.erase(first_key);
+        mtx_.unlock();
+    }
+}
+
+void Logger::writeToJsonFile(double key, const std::vector<std::string> &data)
+{
+    if(!logFile.is_open()) {
+        logFile.open(logFileName, ios::out | ios::ate | ios::app);
+    }
+
+    if(logFile.is_open())
     {
         std::string str;
         char buffer[255];
         sprintf(buffer, "{\n\t\"key\": %3f, \n\t\"log\":[\t", key);
         str.append(buffer);
-        for (int i=0; i<data.size(); i++)
+        for (unsigned int i=0; i<data.size(); i++)
         {
-            QString sub_str = data[i];
-            str.append(sub_str.toStdString());
+            string sub_str = data[i];
+            str.append(sub_str);
             //if(i < data.size()-1)
                 str.append("\n\t\t");
             //else
                 //str
         }
         str.append("] }\n");
-        log_file.write(str.c_str());
-        log_file.flush();
+        logFile << str.c_str();
+        logFile.flush();
     }
 }
