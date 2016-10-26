@@ -37,8 +37,8 @@ PlotterWidget::PlotterWidget() :
     connect(ui->qPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(graphClicked(QCPAbstractPlottable*)));
 
     // ************* Set Axis Settings ****************
-    ui->qPlot->xAxis->setAutoTickStep(true);
-    ui->qPlot->xAxis->setTickStep(1);
+    ui->qPlot->xAxis->setTickLength(0, 5);
+    ui->qPlot->xAxis->setSubTickLength(0, 3);
     ui->qPlot->xAxis->setTickLabelRotation(30);
 
     ui->qPlot->yAxis->setRange(-1, 1);
@@ -104,19 +104,23 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
             ui->qPlot->legend->setVisible(true);
 
             if(key > QDateTime::currentMSecsSinceEpoch()/2000) {
-                ui->qPlot->xAxis->setDateTimeFormat("mm:ss");
-                ui->qPlot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
+                QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
+                dateTicker->setDateTimeFormat("mm:ss");
+                ui->qPlot->xAxis->setTicker(dateTicker);
             }
             else {
-                ui->qPlot->xAxis->setNumberFormat("f");
-                ui->qPlot->xAxis->setTickLabelType(QCPAxis::ltNumber);
+                //ui->qPlot->xAxis->setNumberFormat("f");
+
+                ui->qPlot->xAxis->ticker()->setTickCount(9);
+                ui->qPlot->xAxis->setNumberFormat("ebc");
+                ui->qPlot->xAxis->setNumberPrecision(1);
+
             }
         }        
 
         //! add data to lines:
         g1->addData(key, packet.values[i]);
-        g2->clearData();
-        g2->addData(key, packet.values[i]);
+        g2->setData(QVector<double>(1, key), QVector<double>(1, packet.values[i]));
 
         if(!freezed) {
             double upper_bound = qMax(packet.values[i], ui->qPlot->yAxis->range().upper);
@@ -207,10 +211,10 @@ void PlotterWidget::selectionChanged()
     {
         QCPGraph *graph = ui->qPlot->graph(i);
         QCPPlottableLegendItem *item = ui->qPlot->legend->itemWithPlottable(graph);
-        if (item && (item->selected() || graph->selected()))
+        if (item->selected() || graph->selected())
         {
             item->setSelected(true);
-            graph->setSelected(true);
+            graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
         }
     }
 }

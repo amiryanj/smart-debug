@@ -21,7 +21,8 @@ ScatterWidget::ScatterWidget() :
 {
     ui->setupUi(this);    
 
-    ui->scatter->xAxis->setTickStep(2);
+    ui->scatter->xAxis->setTickLength(0, 5);
+    ui->scatter->xAxis->setSubTickLength(0, 3);
     ui->scatter->axisRect()->setupFullAxesBox();
     ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
     ui->scatter->xAxis->setRange(-1, 1);
@@ -90,7 +91,7 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
         vector<string> vec2_string(2);
         vec2_string[0] = packet.legend + "_x";
         vec2_string[1] = packet.legend + "_y";
-        logger.addLogCsv(graph->data()->count(), vec2_string, vec2_double);
+        logger.addLogCsv(graph->dataCount(), vec2_string, vec2_double);
     }
 }
 
@@ -119,14 +120,15 @@ void ScatterWidget::setData(const std::vector<Point> &data, string legend)
 
 void ScatterWidget::clearData()
 {
-    ui->scatter->graph(0)->clearData();
-    ui->scatter->graph(1)->clearData();
+    ui->scatter->graph(0)->data().clear();
+    ui->scatter->graph(1)->data().clear();
     ui->scatter->replot();
 }
 
 void ScatterWidget::enableRecording(bool enable)
 {
-    ui->recButton->setChecked(enable);
+    if(ui->recButton->isChecked() != enable)
+        ui->recButton->click();
 }
 
 void ScatterWidget::selectionChanged()
@@ -164,10 +166,10 @@ void ScatterWidget::selectionChanged()
     {
         QCPGraph *graph = ui->scatter->graph(i);
         QCPPlottableLegendItem *item = ui->scatter->legend->itemWithPlottable(graph);
-        if (item && (item->selected() || graph->selected()))
+        if (item->selected() || graph->selected())
         {
             item->setSelected(true);
-            graph->setSelected(true);
+            graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
         }
     }
 }

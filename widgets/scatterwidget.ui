@@ -50,7 +50,8 @@
        </property>
        <property name="icon">
         <iconset resource="../resources/icons.qrc">
-         <normaloff>:/png-icons/media-collection/multimedia.png</normaloff>:/png-icons/media-collection/multimedia.png</iconset>
+         <normaloff>:/png-icons/media-collection/multimedia.png</normaloff>
+         <normalon>:/png-icons/media-collection/rec.png</normalon>:/png-icons/media-collection/multimedia.png</iconset>
        </property>
        <property name="iconSize">
         <size>

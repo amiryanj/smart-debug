@@ -103,7 +103,7 @@ void Logger::persistCsvLogs()
         map<string, double> first_val = csvLogMap.begin()->second;
 
         if(!logFile.is_open()) {
-            cout << logFileName << endl;
+            cout << "writing to " << logFileName << endl;
             logFile.open(log_dir + logFileName, ios::out | ios::app | ios::ate);
             //if(logFile.pos() != 0)
             {
