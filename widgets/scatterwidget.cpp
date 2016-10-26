@@ -125,6 +125,31 @@ void ScatterWidget::clearData()
     ui->scatter->replot();
 }
 
+void ScatterWidget::addBaseLine(const Point &p1, const Point &p2, string legend)
+{
+    QCPGraph *graph = NULL;
+    for(int j=0; j<ui->scatter->legend->itemCount(); j++)
+    {
+        if(ui->scatter->graph(j)->name() == QString::fromStdString(legend))
+        {
+            graph = ui->scatter->graph(j);
+            break;
+        }
+    }
+
+    if(!graph)
+    {
+        graph = ui->scatter->addGraph();
+        // ----------------------- Scatter Configuration ---------------------------
+        graph->setName(QString::fromStdString(legend));
+        graph->setPen(QPen((Qt::GlobalColor)(ui->scatter->graphCount()%13+6)));
+    }
+    QVector<double> keys, vals;
+    keys << p1.x << p2.x;
+    vals << p1.y << p2.y;
+    graph->setData(keys, vals);
+}
+
 void ScatterWidget::enableRecording(bool enable)
 {
     if(ui->recButton->isChecked() != enable)

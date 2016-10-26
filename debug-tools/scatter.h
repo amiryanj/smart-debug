@@ -43,6 +43,7 @@ public:
     virtual void addData(float x, float y, std::string legend = "Unknown") = 0;
     virtual void setData(const std::vector<Point> &data, std::string legend = "Unknown") = 0;
     virtual void clearData() = 0;
+    virtual void addBaseLine(const Point &p1, const Point &p2, std::string legend = "Unknown Line") = 0;
     virtual void enableRecording(bool enable) {}
     virtual void setCategory(const std::string &category_);
     std::string getCategory() const;
