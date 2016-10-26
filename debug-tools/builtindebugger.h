@@ -38,8 +38,6 @@ namespace dbug
     //    void drawRect();
 
     signals:
-        void plotRequest(const PlotterPacket &p);
-        void scatterRequest(const ScatterPacket &p);
         void printRequest(QString msg , QString category);
 
     protected:

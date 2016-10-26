@@ -12,8 +12,6 @@ BuiltInDebugger::BuiltInDebugger(QWidget *parent) : QObject()
 {
     widgets_manager = new BuiltInWidgetManager(parent);
     widgets_manager->show();
-//    connect(this, &BuiltInDebug::plotRequest, widgets_manager, &WidgetsManager::plot);
-//    connect(this, &BuiltInDebug::scatterRequest, widgets_manager, &WidgetsManager::scatter);
 }
 
 void BuiltInDebugger::print(const char *msg, double time, const string &category)
@@ -35,23 +33,21 @@ void BuiltInDebugger::plot(PlotterPacket &packet)
 {
     if(packet.key < 0)
         packet.key = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch()/1000.;
-    emit plotRequest(packet);
+    getPlotter(packet.name)->addPacket(packet);
 }
 
 void BuiltInDebugger::plot(const string &name, double value, double key, const string &category)
-{
-    if(key < 0)
-        key = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch()/1000.;
+{    
     PlotterPacket packet;
     packet.append(name, value);
     packet.key = key;
     packet.name = category;
-    emit plotRequest(packet);
+    plot(packet);
 }
 
 void BuiltInDebugger::scatter(ScatterPacket &packet)
 {
-    scatterRequest(packet);
+    getScatter(packet.name)->addPacket(packet);
 }
 
 void BuiltInDebugger::scatter(double x, double y, string name, const string &category)
@@ -61,7 +57,7 @@ void BuiltInDebugger::scatter(double x, double y, string name, const string &cat
     packet.point.y = y;
     packet.name = category;
     packet.legend = name;
-    scatterRequest(packet);
+    scatter(packet);
 }
 
 PlotterWidget *BuiltInDebugger::getPlotter(const string &name)
