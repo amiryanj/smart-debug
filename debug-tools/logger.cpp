@@ -98,16 +98,15 @@ void Logger::persistJsonLogs()
 
 void Logger::persistCsvLogs()
 {
-    while(!csvLogMap.empty() && !csvColumnTitles.empty())
+    try
     {
-        double first_key = csvLogMap.begin()->first;
-        map<string, double> first_val = csvLogMap.begin()->second;
+        logFile.open(log_dir + logFileName, ios::out | ios::app | ios::ate);
+        if(!logFile.is_open())
+            throw "Can not open log file";
 
-        if(headerIsWritten)
+        if(!headerIsWritten)
         {
-            cout << "writing to " << logFileName << endl;
-            logFile.open(log_dir + logFileName, ios::out | ios::app | ios::ate);
-
+            cout << "Writing to " << logFileName << endl;
             /// write csv header
             logFile << "key, ";
             for(unsigned int i=0; i<csvColumnTitles.size(); i++) {
@@ -117,10 +116,17 @@ void Logger::persistCsvLogs()
                 else
                     logFile << "\n";
             }
+            headerIsWritten = true;
         }
 
-        if(logFile.is_open())
+        while(!csvLogMap.empty())
         {
+            if(csvColumnTitles.empty())
+                throw "Data column not found";
+
+            double first_key = csvLogMap.begin()->first;
+            map<string, double> first_val = csvLogMap.begin()->second;
+
             logFile << first_key << ", ";
             for(unsigned int i=0; i<csvColumnTitles.size(); i++)
             {
@@ -134,13 +140,20 @@ void Logger::persistCsvLogs()
                 else
                     logFile << "\n";
             }
-            logFile.flush();
+
+            mtx_.lock();
+            csvLogMap.erase(first_key);
+            mtx_.unlock();
         }
 
-        mtx_.lock();
-        csvLogMap.erase(first_key);
-        mtx_.unlock();
+        logFile.flush();
+        logFile.close();
     }
+
+    catch(const char* err) {
+        cerr << err << endl;
+    }
+
 }
 
 void Logger::writeToJsonFile(double key, const std::vector<std::string> &data)

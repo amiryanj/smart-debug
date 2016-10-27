@@ -119,8 +119,9 @@ void BuiltInWidgetManager::turnOffWidget(const QString &name)
 
 void BuiltInWidgetManager::on_saveToButton_clicked()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), "/home", QFileDialog::ShowDirsOnly);
-    ui->saveToDirLineEdit->setText(dir);
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"), ui->saveToDirLineEdit->text(), QFileDialog::ShowDirsOnly);
+    if(!dir.isEmpty())
+        ui->saveToDirLineEdit->setText(dir);
 }
 
 void BuiltInWidgetManager::on_recordButton_clicked(bool checked)
