@@ -16,6 +16,7 @@ class Logger : public QObject
     mutable std::mutex mtx_;
     std::string logFileName;
     std::ofstream logFile;
+    bool headerIsWritten;
 
     std::map<double, std::vector<std::string> > jsonLogMap;
 

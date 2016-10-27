@@ -29,7 +29,7 @@ QToolButton { border: 1px solid magenta;
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
-    <number>2</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>1</number>
@@ -41,19 +41,19 @@ QToolButton { border: 1px solid magenta;
     <number>1</number>
    </property>
    <property name="bottomMargin">
-    <number>1</number>
+    <number>0</number>
    </property>
    <item>
     <layout class="QVBoxLayout" name="leftLayout" stretch="0,0">
      <property name="spacing">
-      <number>2</number>
+      <number>1</number>
      </property>
      <item>
       <widget class="QToolButton" name="minimizeButton">
        <property name="minimumSize">
         <size>
-         <width>32</width>
-         <height>32</height>
+         <width>24</width>
+         <height>24</height>
         </size>
        </property>
        <property name="text">
@@ -66,8 +66,8 @@ QToolButton { border: 1px solid magenta;
        </property>
        <property name="iconSize">
         <size>
-         <width>32</width>
-         <height>32</height>
+         <width>24</width>
+         <height>24</height>
         </size>
        </property>
        <property name="checkable">
@@ -120,8 +120,8 @@ QToolButton { border: 1px solid magenta;
           </property>
           <property name="iconSize">
            <size>
-            <width>32</width>
-            <height>32</height>
+            <width>24</width>
+            <height>24</height>
            </size>
           </property>
           <property name="checkable">
@@ -144,8 +144,8 @@ QToolButton { border: 1px solid magenta;
           </property>
           <property name="iconSize">
            <size>
-            <width>32</width>
-            <height>32</height>
+            <width>24</width>
+            <height>24</height>
            </size>
           </property>
           <property name="checkable">
@@ -181,8 +181,8 @@ QToolButton { border: 1px solid magenta;
           </property>
           <property name="iconSize">
            <size>
-            <width>32</width>
-            <height>32</height>
+            <width>24</width>
+            <height>24</height>
            </size>
           </property>
          </widget>
@@ -192,10 +192,13 @@ QToolButton { border: 1px solid magenta;
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Maximum</enum>
+          </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>20</width>
-            <height>40</height>
+            <width>10</width>
+            <height>20</height>
            </size>
           </property>
          </spacer>
@@ -306,16 +309,16 @@ QToolButton { border: 1px solid magenta;
        <number>2</number>
       </property>
       <property name="leftMargin">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>1</number>
+       <number>0</number>
       </property>
       <item>
        <widget class="Line" name="hor_line">

@@ -12,6 +12,7 @@ QTimer Logger::timer;
 Logger::Logger()
 {
     connect(&timer, &QTimer::timeout, this, &Logger::persistCsvLogs);
+    headerIsWritten = false;
 }
 
 Logger::~Logger()
@@ -102,20 +103,19 @@ void Logger::persistCsvLogs()
         double first_key = csvLogMap.begin()->first;
         map<string, double> first_val = csvLogMap.begin()->second;
 
-        if(!logFile.is_open()) {
+        if(headerIsWritten)
+        {
             cout << "writing to " << logFileName << endl;
             logFile.open(log_dir + logFileName, ios::out | ios::app | ios::ate);
-            //if(logFile.pos() != 0)
-            {
-                /// write csv header
-                logFile << "key, ";
-                for(unsigned int i=0; i<csvColumnTitles.size(); i++) {
-                    logFile << csvColumnTitles[i];
-                    if(i!=csvColumnTitles.size()-1)
-                        logFile << ", ";
-                    else
-                        logFile << "\n";
-                }
+
+            /// write csv header
+            logFile << "key, ";
+            for(unsigned int i=0; i<csvColumnTitles.size(); i++) {
+                logFile << csvColumnTitles[i];
+                if(i!=csvColumnTitles.size()-1)
+                    logFile << ", ";
+                else
+                    logFile << "\n";
             }
         }
 
@@ -160,9 +160,7 @@ void Logger::writeToJsonFile(double key, const std::vector<std::string> &data)
             string sub_str = data[i];
             str.append(sub_str);
             //if(i < data.size()-1)
-                str.append("\n\t\t");
-            //else
-                //str
+            str.append("\n\t\t");
         }
         str.append("] }\n");
         logFile << str.c_str();
