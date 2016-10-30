@@ -24,18 +24,14 @@ namespace dbug {
         virtual void print(const char *msg, const std::string &category = "general") = 0;
 
         virtual void plot(PlotterPacket &packet) = 0;
-        virtual void plot(const std::string &name, double value, double key = -1, const std::string &category = "general") {}
+        virtual void plot(const std::string &name, double value, double key = -1, const std::string &category = "general") = 0;
 
         virtual void scatter(ScatterPacket &packet) = 0;
-        virtual void scatter(double x, double y, std::string name = "", const std::string &category = "general") {}
-
-        virtual void drawCircle() {}
-        virtual void drawLine() {}
-        virtual void drawRect() {}
+        virtual void scatter(double x, double y, std::string name = "", const std::string &category = "general") = 0;
 
 
-        virtual Plotter* getPlotter(const std::string &name) { (void) name; }
-        virtual Scatter* getScatter(const std::string &name) { (void) name; }
+        virtual Plotter* getPlotter(const std::string &name) = 0;
+        virtual Scatter* getScatter(const std::string &name) = 0;
 
     };
 
