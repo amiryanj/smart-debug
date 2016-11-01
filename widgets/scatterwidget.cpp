@@ -33,7 +33,7 @@ ScatterWidget::ScatterWidget() :
     connect(ui->scatter->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->scatter->yAxis2, SLOT(setRange(QCPRange)));
 
     // connect slot that ties some axis selections together (especially opposite axes):
-    connect(ui->scatter, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
+    connect(ui->scatter, &QCustomPlot::selectionChangedByUser, this, &ScatterWidget::selectionChanged);
     // connect slots that takes care that when an axis is selected, only that direction can be dragged and zoomed:
     connect(ui->scatter, &QCustomPlot::mousePress, this, &ScatterWidget::mousePress);
     connect(ui->scatter, &QCustomPlot::mouseWheel, this, &ScatterWidget::mouseWheel);
@@ -241,11 +241,13 @@ void ScatterWidget::selectionChanged()
     {
         QCPGraph *graph = ui->scatter->graph(i);
         QCPPlottableLegendItem *item = ui->scatter->legend->itemWithPlottable(graph);
-        if (item->selected() || graph->selected())
+        if (graph->selected())
         {
             item->setSelected(true);
-            graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
+            //graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
         }
+        else
+            item->setSelected(false);
     }
 }
 
