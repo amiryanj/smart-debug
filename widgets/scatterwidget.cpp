@@ -39,7 +39,7 @@ ScatterWidget::ScatterWidget() :
     connect(ui->scatter, &QCustomPlot::mouseWheel, this, &ScatterWidget::mouseWheel);
 
     // Add Drag, Zoom and ... capabilities
-    ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems | QCP::iSelectPlottables | QCP::iSelectAxes);
+    ui->scatter->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems | QCP::iSelectPlottables | QCP::iSelectAxes | QCP::iMultiSelect);
 }
 
 ScatterWidget::~ScatterWidget()

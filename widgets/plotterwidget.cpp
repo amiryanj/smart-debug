@@ -27,7 +27,7 @@ PlotterWidget::PlotterWidget() :
     statusGItem->setPos(w/2, h/2);
 
     // Add Drag, Zoom and ... capabilities
-    ui->qPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems | QCP::iSelectPlottables | QCP::iSelectAxes);
+    ui->qPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectItems | QCP::iSelectPlottables | QCP::iSelectAxes | QCP::iMultiSelect);
 
     // make bottom and left axes transfer their ranges to top and right axes:
     connect(ui->qPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->qPlot->xAxis2, SLOT(setRange(QCPRange)));
