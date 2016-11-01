@@ -29,10 +29,10 @@ public:
 
     void addPacket(const ScatterPacket& packet);
     void addData(float x, float y, std::string legend = "Unknown Data");
-    void addData(const Point &point, std::string legend = "Unknown Data");
-    void setData(const std::vector<Point> &data, std::string legend = "Unknown Data");
-    void clearData();
-    void addBaseLine(const Point &p1, const Point &p2, std::string legend = "Unknown Line");
+    void addData(const PointD &point, std::string legend = "Unknown Data");
+    void setData(const std::vector<PointD> &data, std::string legend = "Unknown Data");
+    void clearData(std::string legend = "");
+    void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line");
     void enableRecording(bool enable);
 
 private slots:

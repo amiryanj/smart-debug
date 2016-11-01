@@ -50,11 +50,11 @@ ScatterWidget::~ScatterWidget()
 void ScatterWidget::addPacket(const ScatterPacket &packet)
 {
     QCPGraph *graph = NULL;
-    for(int j=0; j<ui->scatter->legend->itemCount(); j++)
+    for(int i=0; i<ui->scatter->legend->itemCount(); i++)
     {
-        if(ui->scatter->graph(j)->name() == QString::fromStdString(packet.legend))
+        if(ui->scatter->graph(i)->name() == QString::fromStdString(packet.legend))
         {
-            graph = ui->scatter->graph(j);
+            graph = ui->scatter->graph(i);
             break;
         }
     }
@@ -97,10 +97,10 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
 
 void ScatterWidget::addData(float x, float y, string legend)
 {
-    addData(Point(x, y), legend);
+    addData(PointD(x, y), legend);
 }
 
-void ScatterWidget::addData(const Point &point, string legend)
+void ScatterWidget::addData(const PointD &point, string legend)
 {
     ScatterPacket packet;
     packet.point = point;
@@ -108,8 +108,9 @@ void ScatterWidget::addData(const Point &point, string legend)
     addPacket(packet);
 }
 
-void ScatterWidget::setData(const std::vector<Point> &data, string legend)
+void ScatterWidget::setData(const std::vector<PointD> &data, string legend)
 {
+    clearData(legend);
     ScatterPacket packet;
     packet.legend = legend;
     for(unsigned int i=0; i<data.size(); i++) {
@@ -118,14 +119,20 @@ void ScatterWidget::setData(const std::vector<Point> &data, string legend)
     }
 }
 
-void ScatterWidget::clearData()
+void ScatterWidget::clearData(string legend)
 {
-    ui->scatter->graph(0)->data().clear();
-    ui->scatter->graph(1)->data().clear();
+    for(int i=0; i<ui->scatter->graphCount(); i++) {
+        if(legend.empty())
+            ui->scatter->removeGraph(i);
+        else if(legend == ui->scatter->graph(i)->name().toStdString()) {
+            ui->scatter->removeGraph(i);
+            break;
+        }
+    }
     ui->scatter->replot();
 }
 
-void ScatterWidget::addBaseLine(const Point &p1, const Point &p2, string legend)
+void ScatterWidget::addBaseLine(const PointD &p1, const PointD &p2, string legend)
 {
     QCPGraph *graph = NULL;
     for(int j=0; j<ui->scatter->legend->itemCount(); j++)
