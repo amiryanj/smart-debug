@@ -110,22 +110,65 @@ void ScatterWidget::addData(const PointD &point, string legend)
 
 void ScatterWidget::setData(const std::vector<PointD> &data, string legend)
 {
-    clearData(legend);
-    ScatterPacket packet;
-    packet.legend = legend;
-    for(unsigned int i=0; i<data.size(); i++) {
-        packet.point = data[i];
-        addPacket(packet);
+    QCPGraph *graph = NULL;
+    for(int i=0; i<ui->scatter->legend->itemCount(); i++)
+    {
+        if(ui->scatter->graph(i)->name() == QString::fromStdString(legend))
+        {
+            graph = ui->scatter->graph(i);
+            break;
+        }
     }
+
+    if(!graph)
+    {
+        graph = ui->scatter->addGraph();
+        // ----------------------- Scatter Configuration ---------------------------
+        graph->setName(QString::fromStdString(legend));
+        graph->setPen(QPen((Qt::GlobalColor)(ui->scatter->graphCount()%13+6)));
+        graph->setLineStyle(QCPGraph::lsNone);
+        graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
+        ui->scatter->legend->setVisible(true);
+    }
+
+    double min_x =  INFINITY, min_y =  INFINITY;
+    double max_x = -INFINITY, max_y = -INFINITY;
+
+    QVector<QCPGraphData> q_data(data.size());
+    for(unsigned int i=0; i<data.size(); i++)
+    {
+        q_data[i] = QCPGraphData(data[i].x, data[i].y);
+
+        if(ui->recButton->isChecked())
+        {
+            vector<double> vec2_double(2);
+            vec2_double[0] = data[i].x;
+            vec2_double[1] = data[i].y;
+            vector<string> vec2_string(2);
+            vec2_string[0] = legend + "_x";
+            vec2_string[1] = legend + "_y";
+            logger.addLogCsv(graph->dataCount(), vec2_string, vec2_double);
+        }
+
+        max_x = qMax(data[i].x, ui->scatter->xAxis->range().upper);
+        min_x = qMin(data[i].x, ui->scatter->xAxis->range().lower);
+        max_y = qMax(data[i].y, ui->scatter->yAxis->range().upper);
+        min_y = qMin(data[i].y, ui->scatter->yAxis->range().lower);
+    }
+
+    graph->data()->set(q_data);
+    ui->scatter->xAxis->setRange(min_x, max_x);
+    ui->scatter->yAxis->setRange(min_y, max_y);
+    ui->scatter->replot();
 }
 
 void ScatterWidget::clearData(string legend)
 {
     for(int i=0; i<ui->scatter->graphCount(); i++) {
         if(legend.empty())
-            ui->scatter->removeGraph(i);
+            ui->scatter->graph(i)->data()->clear();
         else if(legend == ui->scatter->graph(i)->name().toStdString()) {
-            ui->scatter->removeGraph(i);
+            ui->scatter->graph(i)->data()->clear();
             break;
         }
     }
