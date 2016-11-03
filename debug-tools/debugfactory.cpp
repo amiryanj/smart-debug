@@ -21,7 +21,11 @@ Debugger *DebugFactory::createDebugger(DebugFactory::DebuggerStyle style, QWidge
     sDebuggerStyle = style;
     switch (sDebuggerStyle) {
     case DebuggerStyle::eBuiltInDebugger:
-         sDebugger = new BuiltInDebugger(parent);
+#ifdef ACTIVE_SMART_DEBUG
+        sDebugger = new BuiltInDebugger(parent);
+#else
+        sDebugger = new Debugger();
+#endif
         break;
 
     case DebuggerStyle::eNetworkDebugger:

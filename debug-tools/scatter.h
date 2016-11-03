@@ -39,12 +39,12 @@ protected:
 public:
     Scatter() {}
 
-    virtual void addPacket(const ScatterPacket& packet) = 0;
-    virtual void addData(float x, float y, std::string legend = "Unknown") = 0;
-    virtual void setData(const std::vector<PointD> &data, std::string legend = "Unknown") = 0;
-    virtual void clearData(std::string legend = "") = 0;
-    virtual void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line") = 0;
-    virtual void enableRecording(bool enable) {}
+    virtual void addPacket(const ScatterPacket& packet) {} ;
+    virtual void addData(float x, float y, std::string legend = "Unknown") {};
+    virtual void setData(const std::vector<PointD> &data, std::string legend = "Unknown") {};
+    virtual void clearData(std::string legend = "") {};
+    virtual void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line") {};
+    virtual void enableRecording(bool enable) {};
     virtual void setCategory(const std::string &category_);
     std::string getCategory() const;
 };

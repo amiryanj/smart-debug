@@ -46,10 +46,10 @@ protected:
 public:
     Plotter() {}
 
-    virtual void addValue(double val, double key = -1, std::string legend = "") =0;
-    virtual void addPacket(const PlotterPacket& packet) =0;
-    virtual void setCategory(const std::string &category_);
+    virtual void addValue(double val, double key = -1, std::string legend = "") {};
+    virtual void addPacket(const PlotterPacket& packet) {};
     virtual void enableRecording(bool enable) {}
+    virtual void setCategory(const std::string &category_);
     std::string getCategory() const;
 };
 

@@ -211,13 +211,8 @@ void PlotterWidget::selectionChanged()
     {
         QCPGraph *graph = ui->qPlot->graph(i);
         QCPPlottableLegendItem *item = ui->qPlot->legend->itemWithPlottable(graph);
-        if (graph->selected())
-        {
-            item->setSelected(true);
-            //graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
-        }
-        else
-            item->setSelected(false);
+        if(item)
+            item->setSelected(graph->selected());
     }
 }
 
