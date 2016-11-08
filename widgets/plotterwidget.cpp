@@ -95,10 +95,12 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
             ui->qPlot->legend->removeItem(ui->qPlot->legend->itemCount()-1); // don't show two graphs in legend
 
             int count = ui->qPlot->graphCount();
-            g1->setName(QString::fromStdString(packet.legends[i]));
-            g1->setPen(QPen((Qt::GlobalColor)((count/2)%13+6)));
 
-            g2->setPen(QPen(Qt::blue));
+            QPen myPen((Qt::GlobalColor)((count/2)%13+6));
+            g1->setName(QString::fromStdString(packet.legends[i]));
+            g1->setPen(myPen);
+
+            g2->setPen(myPen);
             g2->setLineStyle(QCPGraph::lsNone);
             g2->setScatterStyle(QCPScatterStyle::ssDisc);
             ui->qPlot->legend->setVisible(true);
@@ -131,7 +133,7 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
     }
 
     if(!freezed)
-        ui->qPlot->xAxis->setRange(key+4, 20, Qt::AlignRight);
+        ui->qPlot->xAxis->setRange(key+ui->qPlot->xAxis->range().size()/4, ui->qPlot->xAxis->range().size(), Qt::AlignRight);
     ui->qPlot->replot();
 
     if(ui->recButton->isChecked()) {
