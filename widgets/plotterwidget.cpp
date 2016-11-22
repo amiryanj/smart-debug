@@ -34,7 +34,7 @@ PlotterWidget::PlotterWidget() :
     connect(ui->qPlot->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->qPlot->yAxis2, SLOT(setRange(QCPRange)));
 
     // connect slot that shows a message in the status bar when a graph is clicked:
-    connect(ui->qPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,QMouseEvent*)), this, SLOT(graphClicked(QCPAbstractPlottable*)));
+    connect(ui->qPlot, SIGNAL(plottableClick(QCPAbstractPlottable*,int,QMouseEvent*)), this, SLOT(graphClicked(QCPAbstractPlottable*)));
 
     // ************* Set Axis Settings ****************
     ui->qPlot->xAxis->setTickLength(0, 5);
