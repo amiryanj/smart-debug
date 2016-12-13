@@ -9,7 +9,7 @@
 //========================================================================
 #include "widgetmanger.h"
 
-namespace dbug {
+namespace sdbug {
 
 WidgetManger::WidgetManger()
 {

@@ -23,7 +23,7 @@
 namespace Ui {
 class BuiltInWidgetManager;
 }
-namespace dbug
+namespace sdbug
 {
     class PlotterWidget;
     class ScatterWidget;

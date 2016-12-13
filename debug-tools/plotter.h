@@ -15,7 +15,7 @@
 #include <string>
 #include <cstdio>
 
-namespace dbug {
+namespace sdbug {
 
 using namespace std;
 

@@ -18,7 +18,7 @@
 namespace Ui {
 class ScatterWidget;
 }
-namespace dbug {
+namespace sdbug {
 class ScatterWidget : public QWidget, public Scatter
 {
     Q_OBJECT

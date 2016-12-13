@@ -3,7 +3,7 @@
 #include <iostream>
 
 using namespace std;
-namespace dbug {
+namespace sdbug {
 
 // initialize static members
 DebugFactory::DebuggerStyle DebugFactory::sDebuggerStyle = DebugFactory::DebuggerStyle::eBuiltInDebugger;

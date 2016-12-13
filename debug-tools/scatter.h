@@ -13,7 +13,7 @@
 #include "logger.h"
 #include <string>
 
-namespace dbug {
+namespace sdbug {
 
 struct PointD {
     PointD() {}

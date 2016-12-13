@@ -6,7 +6,7 @@
 #include "scatterwidget.h"
 #include <map>
 
-namespace dbug {
+namespace sdbug {
 
     Debugger* dbuger();
 

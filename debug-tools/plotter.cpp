@@ -9,7 +9,7 @@
 //========================================================================
 #include "plotter.h"
 
-namespace dbug {
+namespace sdbug {
 
 PlotterPacket::PlotterPacket()
 {

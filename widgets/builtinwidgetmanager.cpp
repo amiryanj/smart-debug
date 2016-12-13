@@ -17,7 +17,7 @@
 #include <QDateTime>
 #include <QString>
 
-namespace dbug
+namespace sdbug
 {
 BuiltInWidgetManager::BuiltInWidgetManager(QWidget *parent) :
     QWidget(parent), ui(new Ui::BuiltInWidgetManager)

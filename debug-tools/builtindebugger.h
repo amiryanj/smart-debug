@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QString>
 
-namespace dbug
+namespace sdbug
 {
     class BuiltInDebugger : public QObject , public Debugger
     {

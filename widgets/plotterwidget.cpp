@@ -1,7 +1,7 @@
 #include "plotterwidget.h"
 #include "ui_plotterwidget.h"
 
-namespace dbug {
+namespace sdbug {
 
 PlotterWidget::PlotterWidget() :
     ui(new Ui::PlotterWidget)

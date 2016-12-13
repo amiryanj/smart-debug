@@ -7,7 +7,7 @@
 #include "widgetmanger.h"
 #include "logger.h"
 
-namespace dbug {
+namespace sdbug {
 
     class Debugger
     {

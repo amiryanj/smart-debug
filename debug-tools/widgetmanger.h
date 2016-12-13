@@ -10,7 +10,7 @@
 #ifndef _WIDGETMANGER_H
 #define _WIDGETMANGER_H
 
-namespace dbug {
+namespace sdbug {
 
 class WidgetManger
 {

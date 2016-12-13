@@ -6,7 +6,7 @@
 #include <sstream>
 
 using namespace std;
-namespace dbug
+namespace sdbug
 {
 BuiltInDebugger::BuiltInDebugger(QWidget *parent) : QObject()
 {

@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace dbug
+namespace sdbug
 {
 
 ScatterWidget::ScatterWidget() :

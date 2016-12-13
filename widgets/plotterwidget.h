@@ -8,7 +8,7 @@
 namespace Ui {
 class PlotterWidget;
 }
-namespace dbug {
+namespace sdbug {
 
 class PlotterWidget : public QWidget, public Plotter
 {

@@ -9,7 +9,7 @@
 //========================================================================
 #include "scatter.h"
 
-namespace dbug
+namespace sdbug
 {
 std::string Scatter::getCategory() const
 {
