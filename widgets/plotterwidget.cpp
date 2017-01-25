@@ -152,6 +152,11 @@ void PlotterWidget::addValue(double val, double key, string legend)
     addPacket(packet);
 }
 
+void PlotterWidget::reset()
+{
+    ui->qPlot->clearGraphs();
+}
+
 void PlotterWidget::forceToPause()
 {
     if(!freezed)

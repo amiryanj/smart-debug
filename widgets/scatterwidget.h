@@ -39,8 +39,12 @@ private slots:
     void selectionChanged();
     void mousePress();
     void mouseWheel();
-
+    void zoomToAllData();
     
+    void on_eraseButton_clicked();
+    void on_snapButton_clicked();
+    void on_zoomButton_clicked();
+
 private:
     Ui::ScatterWidget *ui;
 };

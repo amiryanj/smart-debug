@@ -10,6 +10,8 @@
 
 #include "scatterwidget.h"
 #include "ui_scatterwidget.h"
+#include <QDateTime>
+#include <QFileDialog>
 
 using namespace std;
 
@@ -19,7 +21,7 @@ namespace sdbug
 ScatterWidget::ScatterWidget() :
     ui(new Ui::ScatterWidget)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
 
     ui->scatter->xAxis->setTickLength(0, 5);
     ui->scatter->xAxis->setSubTickLength(0, 3);
@@ -274,4 +276,65 @@ void ScatterWidget::mouseWheel()
     else
         ui->scatter->axisRect()->setRangeZoom(Qt::Horizontal|Qt::Vertical);
 }
+
+void ScatterWidget::zoomToAllData()
+{
+//    double max_x = qMax(packet.point.x, ui->scatter->xAxis->range().upper);
+//    double min_x = qMin(packet.point.x, ui->scatter->xAxis->range().lower);
+//    double max_y = qMax(packet.point.y, ui->scatter->yAxis->range().upper);
+//    double min_y = qMin(packet.point.y, ui->scatter->yAxis->range().lower);
+
+//    ui->scatter->xAxis->setRange(min_x, max_x);
+//    ui->scatter->yAxis->setRange(min_y, max_y);
 }
+void ScatterWidget::on_eraseButton_clicked()
+{
+    this->clearData();
+}
+
+void ScatterWidget::on_snapButton_clicked()
+{
+    QPixmap pixmap(ui->scatter->size());
+    ui->scatter->render(&pixmap);
+
+    QFileDialog dialog(this);
+    dialog.setOption(QFileDialog::ShowDirsOnly, true);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    QStringList formats;
+    formats << "pdf" << "bmp" << "png" << "jpg" ;
+    dialog.setNameFilters(formats);
+
+    QString default_name = QDateTime::currentDateTime().toString("yyyy-MMM-dd_HH:mm:ss");
+    dialog.selectFile(default_name);
+    //QString format = "png";
+    //dialog.setDirectory(QDir::homePath());
+
+    if(dialog.exec() == QFileDialog::Accepted)
+    {
+        QStringList file_names  = dialog.selectedFiles();
+        QString selected_format = dialog.selectedNameFilter();
+        if(!file_names.empty())
+        {
+            if (selected_format == "pdf")
+                ui->scatter->savePdf(file_names[0] + "." + selected_format, 0, 0);
+            else if(selected_format == "bmp")
+                ui->scatter->saveBmp(file_names[0] + "." + selected_format, 0, 0, 1., -1);
+            else if(selected_format == "png")
+                ui->scatter->savePng(file_names[0] + "." + selected_format, 0, 0, 1., -1);
+            else if(selected_format == "jpg")
+                ui->scatter->saveJpg(file_names[0] + "." + selected_format, 0, 0, 1., -1);
+        }
+    }
+    
+}
+
+void ScatterWidget::on_zoomButton_clicked()
+{
+
+}
+
+}
+
+
+
+

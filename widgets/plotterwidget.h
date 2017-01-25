@@ -25,6 +25,7 @@ public:
 public slots:
     void addPacket(const PlotterPacket &packet);
     void addValue(double val, double key = -1, std::string legend = "");
+    void reset();
 
     void forceToPause();
     void forceToPlay();

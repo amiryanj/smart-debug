@@ -37,5 +37,8 @@
         <file>png-icons/media-collection/switch-2.png</file>
         <file>png-icons/media-collection/switch-3.png</file>
         <file>png-icons/media-collection/stop.png</file>
+        <file>png-icons/design-collection/cogwheel.png</file>
+        <file>png-icons/design-collection/eraser.png</file>
+        <file>png-icons/design-collection/zoom.png</file>
     </qresource>
 </RCC>
