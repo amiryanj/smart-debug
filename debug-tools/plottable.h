@@ -13,7 +13,6 @@
 #include "logger.h"
 
 namespace sdbug {
-using namespace std;
 
 class Plottable
 {    
