@@ -74,16 +74,5 @@ string PlotterPacket::toCSV() const
     }
 }
 
-void Plotter::setCategory(const std::string &category_)
-{
-    this->category = category_;
-    logger.setFileName(category_ + ".csv");
-}
-
-std::string Plotter::getCategory() const
-{
-    return category;
-}
-
 }
 

@@ -83,7 +83,10 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
     ui->scatter->xAxis->setRange(min_x, max_x);
     ui->scatter->yAxis->setRange(min_y, max_y);
 
-    ui->scatter->replot();
+    if(realTimePlot)
+        ui->scatter->replot();
+    else
+        ui->scatter->replot(QCustomPlot::rpQueuedReplot);
 
     if(ui->recButton->isChecked())
     {

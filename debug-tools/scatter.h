@@ -10,8 +10,8 @@
 #ifndef _SCATTER_H
 #define _SCATTER_H
 
-#include "logger.h"
 #include <string>
+#include "plottable.h"
 
 namespace sdbug {
 
@@ -30,12 +30,8 @@ public:
     std::string name; // category
 };
 
-class Scatter
+class Scatter : public Plottable
 {
-protected:
-    Logger logger;
-    std::string category;
-
 public:
     Scatter() {}
 
@@ -44,9 +40,7 @@ public:
     virtual void setData(const std::vector<PointD> &data, std::string legend = "Unknown") {};
     virtual void clearData(std::string legend = "") {};
     virtual void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line") {};
-    virtual void enableRecording(bool enable) {};
-    virtual void setCategory(const std::string &category_);
-    std::string getCategory() const;
+
 };
 
 

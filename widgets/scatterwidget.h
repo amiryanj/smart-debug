@@ -34,6 +34,7 @@ public:
     void clearData(std::string legend = "");
     void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line");
     void enableRecording(bool enable);
+    void setRenderPriority(bool real_time);
 
 private slots:
     void selectionChanged();

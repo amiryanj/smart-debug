@@ -20,7 +20,8 @@ SOURCES += \
     $$PWD/debug-tools/widgetmanger.cpp \
     $$PWD/debug-tools/plotter.cpp \
     $$PWD/debug-tools/scatter.cpp \
-    $$PWD/widgets/plotterwidget.cpp
+    $$PWD/widgets/plotterwidget.cpp \
+    $$PWD/debug-tools/plottable.cpp
 
 HEADERS += \
     $$PWD/qcustomplot/qcustomplot.h \
@@ -34,7 +35,8 @@ HEADERS += \
     $$PWD/debug-tools/widgetmanger.h \
     $$PWD/debug-tools/plotter.h \
     $$PWD/debug-tools/scatter.h \
-    $$PWD/widgets/plotterwidget.h
+    $$PWD/widgets/plotterwidget.h \
+    $$PWD/debug-tools/plottable.h
 
 FORMS += \
     $$PWD/widgets/builtinwidgetmanager.ui \

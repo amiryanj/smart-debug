@@ -134,7 +134,12 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
 
     if(!freezed)
         ui->qPlot->xAxis->setRange(key+ui->qPlot->xAxis->range().size()/4, ui->qPlot->xAxis->range().size(), Qt::AlignRight);
-    ui->qPlot->replot();
+
+    if(realTimePlot)
+        ui->qPlot->replot();
+    else
+        ui->qPlot->replot(QCustomPlot::rpQueuedReplot);
+
 
     if(ui->recButton->isChecked()) {
         logger.addLogCsv(key, packet.legends, packet.values);

@@ -10,10 +10,10 @@
 #ifndef _PLOTTER_H
 #define _PLOTTER_H
 
-#include "logger.h"
 #include <vector>
 #include <string>
 #include <cstdio>
+#include "plottable.h"
 
 namespace sdbug {
 
@@ -37,21 +37,15 @@ public:
     vector<string> legends;
 };
 
-class Plotter
+class Plotter : public Plottable
 {
-protected:
-    Logger logger;
-    std::string category;
-
 public:
     Plotter() {}
 
     virtual void addValue(double val, double key = -1, std::string legend = "") {};
     virtual void addPacket(const PlotterPacket& packet) {};
-    virtual void enableRecording(bool enable) {};
     virtual void reset() {};
-    virtual void setCategory(const std::string &category_);
-    std::string getCategory() const;
+
 };
 
 }

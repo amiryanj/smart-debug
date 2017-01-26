@@ -9,17 +9,3 @@
 //========================================================================
 #include "scatter.h"
 
-namespace sdbug
-{
-std::string Scatter::getCategory() const
-{
-    return category;
-}
-
-void Scatter::setCategory(const std::string &category_)
-{
-    logger.setFileName(category_ + ".csv");
-    category = category_;
-}
-
-}
