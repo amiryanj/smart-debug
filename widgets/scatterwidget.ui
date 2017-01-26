@@ -48,6 +48,9 @@
      </property>
      <item>
       <widget class="QToolButton" name="recButton">
+       <property name="toolTip">
+        <string>Record</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
@@ -69,6 +72,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="eraseButton">
+       <property name="toolTip">
+        <string>Erase data</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
@@ -86,6 +92,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="snapButton">
+       <property name="toolTip">
+        <string>Take screenshot</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
@@ -103,6 +112,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="zoomButton">
+       <property name="toolTip">
+        <string>Zoom to all data</string>
+       </property>
        <property name="text">
         <string>...</string>
        </property>
