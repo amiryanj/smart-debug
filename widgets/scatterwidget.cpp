@@ -66,7 +66,9 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(packet.legend));
-        graph->setPen(QPen((Qt::GlobalColor)(ui->scatter->graphCount()%13+6)));
+        Qt::GlobalColor color_code = Qt::GlobalColor(ui->scatter->graphCount()%13 + 6);
+        if(color_code == Qt::blue) color_code = Qt::darkGray;
+        graph->setPen(QPen(color_code));
         graph->setLineStyle(QCPGraph::lsNone);
         graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
         ui->scatter->legend->setVisible(true);

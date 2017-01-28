@@ -1,7 +1,7 @@
 QT += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-DEFINES += ACTIVE_SMART_DEBUG
+#DEFINES += ACTIVE_SMART_DEBUG
 
 INCLUDEPATH += $$PWD \
     $$PWD/qcustomplot \
