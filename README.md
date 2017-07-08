@@ -25,5 +25,6 @@ For example the plots shown in the following shot is created by this simple code
     }
 
 ```
+![Plot](https://github.com/amiryanj/smart-debug/blob/master/resources/shot1.png "Plot")
 
 This tool itself uses QCustomPlot library which is a strong tool for plot purposes. However we tried to provide a very simple API to faciliate test scenarios.
