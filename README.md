@@ -1,5 +1,5 @@
 # Smart-Debug
-========
+
 Smart-Debug is a Qt-based module that brings facility of debugging c++ codes through plots, scatters, messengers, etc. almost in realtime. If you want plot the values of a variable by time, compare it to some other variables, or you need displaying a set of 2D points on a professional coordinate system this small tool will help you.
 
 For example the plots shown in the following shot is created by this simple code:
