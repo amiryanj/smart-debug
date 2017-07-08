@@ -16,7 +16,7 @@ namespace sdbug {
         std::map<std::string, Scatter*> scatterMap;
 
     public:
-        Debugger() { }
+        Debugger() {}
         virtual WidgetManger *widgetManager() const { return NULL;}
         virtual ~Debugger() {;}
 
@@ -30,11 +30,11 @@ namespace sdbug {
         virtual void scatter(double x, double y, std::string name = "", const std::string &category = "general") {};
 
 
-        virtual Plotter* getPlotter(const std::string &name) {
+        virtual Plotter* getPlotter(const std::string &/*name*/) {
             static Plotter* empty_plotter = new Plotter;
             return empty_plotter;
         }
-        virtual Scatter* getScatter(const std::string &name) {
+        virtual Scatter* getScatter(const std::string &/*name*/) {
             static Scatter* empty_scatter = new Scatter;
             return empty_scatter;
         }

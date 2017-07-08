@@ -52,7 +52,8 @@ ScatterWidget::~ScatterWidget()
 void ScatterWidget::addPacket(const ScatterPacket &packet)
 {
     QCPGraph *graph = NULL;
-    for(int i=0; i<ui->scatter->legend->itemCount(); i++)
+    int nG = ui->scatter->graphCount();
+    for(int i=0; i<nG; i++)
     {
         if(ui->scatter->graph(i)->name() == QString::fromStdString(packet.legend))
         {
@@ -66,9 +67,8 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(packet.legend));
-        Qt::GlobalColor color_code = Qt::GlobalColor(ui->scatter->graphCount()%13 + 6);
-        if(color_code == Qt::blue) color_code = Qt::darkGray;
-        graph->setPen(QPen(color_code));
+        QColor color_ = colorManager.getNewColor();
+        graph->setPen(QPen(color_));
         graph->setLineStyle(QCPGraph::lsNone);
         graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
         ui->scatter->legend->setVisible(true);
@@ -118,7 +118,8 @@ void ScatterWidget::addData(const PointD &point, string legend)
 void ScatterWidget::setData(const std::vector<PointD> &data, string legend)
 {
     QCPGraph *graph = NULL;
-    for(int i=0; i<ui->scatter->legend->itemCount(); i++)
+    int nG = ui->scatter->graphCount();
+    for(int i=0; i<nG; i++)
     {
         if(ui->scatter->graph(i)->name() == QString::fromStdString(legend))
         {
@@ -132,7 +133,8 @@ void ScatterWidget::setData(const std::vector<PointD> &data, string legend)
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(legend));
-        graph->setPen(QPen((Qt::GlobalColor)(ui->scatter->graphCount()%13+6)));
+        QColor color_ = colorManager.getNewColor();
+        graph->setPen(QPen(color_));
         graph->setLineStyle(QCPGraph::lsNone);
         graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
         ui->scatter->legend->setVisible(true);
@@ -179,13 +181,22 @@ void ScatterWidget::clearData(string legend)
             break;
         }
     }
+    for(int i=0; i<ui->scatter->lineGraphCount(); i++) {
+        if(legend.empty())
+            ui->scatter->lineGraph(i)->data()->clear();
+        else if(legend == ui->scatter->lineGraph(i)->name().toStdString()) {
+            ui->scatter->lineGraph(i)->data()->clear();
+            break;
+        }
+    }
     ui->scatter->replot();
 }
 
 void ScatterWidget::addBaseLine(const PointD &p1, const PointD &p2, string legend)
 {
     QCPGraph *graph = NULL;
-    for(int j=0; j<ui->scatter->legend->itemCount(); j++)
+    int nG = ui->scatter->graphCount();
+    for(int j=0; j<nG; j++)
     {
         if(ui->scatter->graph(j)->name() == QString::fromStdString(legend))
         {
@@ -199,12 +210,39 @@ void ScatterWidget::addBaseLine(const PointD &p1, const PointD &p2, string legen
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(legend));
-        graph->setPen(QPen((Qt::GlobalColor)(ui->scatter->graphCount()%13+6)));
+        QColor color_ = colorManager.getNewColor();
+        graph->setPen(QPen(color_));
     }
     QVector<double> keys, vals;
     keys << p1.x << p2.x;
     vals << p1.y << p2.y;
     graph->setData(keys, vals);
+}
+
+void ScatterWidget::addLineSegment(const PointD &p1, const PointD &p2, string legend)
+{
+    //QCPGraph *graph = NULL;
+    QCPLineBasedGraph * graph = NULL;
+    int nG = ui->scatter->graphCount();
+    int nLG = ui->scatter->lineGraphCount();
+    for(int j=0; j<nLG; j++)
+    {
+        if(ui->scatter->lineGraph(j)->name() == QString::fromStdString(legend))
+        {
+            graph = ui->scatter->lineGraph(j);
+            break;
+        }
+    }
+
+    if(!graph)
+    {
+        graph = ui->scatter->addLineGraph();
+        // ----------------------- Scatter Configuration ---------------------------
+        graph->setName(QString::fromStdString(legend));
+        QColor color_ = colorManager.getNewColor();
+        graph->setPen(QPen(color_));
+    }
+    graph->addData(p1.x, p1.y, p2.x, p2.y);
 }
 
 void ScatterWidget::enableRecording(bool enable)
@@ -247,6 +285,19 @@ void ScatterWidget::selectionChanged()
     for (int i=0; i<ui->scatter->graphCount(); ++i)
     {
         QCPGraph *graph = ui->scatter->graph(i);
+        QCPPlottableLegendItem *item = ui->scatter->legend->itemWithPlottable(graph);
+        if (graph->selected())
+        {
+            item->setSelected(true);
+            //graph->setSelection(QCPDataSelection(graph->data()->dataRange()));
+        }
+        else
+            item->setSelected(false);
+    }
+     //synchronize selection of graphs with selection of corresponding legend items:
+    for (int i=0; i<ui->scatter->lineGraphCount(); ++i)
+    {
+        QCPLineBasedGraph *graph = ui->scatter->lineGraph(i);
         QCPPlottableLegendItem *item = ui->scatter->legend->itemWithPlottable(graph);
         if (graph->selected())
         {

@@ -1,7 +1,7 @@
 QT += core gui
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-#DEFINES += ACTIVE_SMART_DEBUG
+DEFINES += ACTIVE_SMART_DEBUG
 
 INCLUDEPATH += $$PWD \
     $$PWD/qcustomplot \
@@ -21,7 +21,8 @@ SOURCES += \
     $$PWD/debug-tools/plotter.cpp \
     $$PWD/debug-tools/scatter.cpp \
     $$PWD/widgets/plotterwidget.cpp \
-    $$PWD/debug-tools/plottable.cpp
+    $$PWD/debug-tools/plottable.cpp \
+    $$PWD/debug-tools/colormanager.cpp
 
 HEADERS += \
     $$PWD/qcustomplot/qcustomplot.h \
@@ -36,7 +37,8 @@ HEADERS += \
     $$PWD/debug-tools/plotter.h \
     $$PWD/debug-tools/scatter.h \
     $$PWD/widgets/plotterwidget.h \
-    $$PWD/debug-tools/plottable.h
+    $$PWD/debug-tools/plottable.h \
+    $$PWD/debug-tools/colormanager.h
 
 FORMS += \
     $$PWD/widgets/builtinwidgetmanager.ui \

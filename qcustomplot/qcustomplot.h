@@ -108,6 +108,7 @@ class QCPSelectionRect;
 class QCPColorMap;
 class QCPColorScale;
 class QCPBars;
+class QCPLineBasedGraph;
 
 /* including file 'src/global.h', size 16131                                 */
 /* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
@@ -2087,6 +2088,7 @@ public:
   SelectablePart getPartAt(const QPointF &pos) const;
   QList<QCPAbstractPlottable*> plottables() const;
   QList<QCPGraph*> graphs() const;
+  QList<QCPLineBasedGraph *> lineGraphs() const;
   QList<QCPAbstractItem*> items() const;
   
   static AxisType marginSideToAxisType(QCP::MarginSide side);
@@ -3654,6 +3656,15 @@ public:
   int graphCount() const;
   QList<QCPGraph*> selectedGraphs() const;
 
+  QCPLineBasedGraph *lineGraph(int index) const;
+  QCPLineBasedGraph *lineGraph() const;
+  QCPLineBasedGraph *addLineGraph(QCPAxis *keyAxis=0, QCPAxis *valueAxis=0);
+  bool removeLineGraph(QCPLineBasedGraph *graph);
+  bool removeLineGraph(int index);
+  int clearLineGraphs();
+  int lineGraphCount() const;
+  QList<QCPLineBasedGraph *> selectedLineGraphs() const;
+
   // item interface:
   QCPAbstractItem *item(int index) const;
   QCPAbstractItem *item() const;
@@ -3728,6 +3739,7 @@ protected:
   bool mAutoAddPlottableToLegend;
   QList<QCPAbstractPlottable*> mPlottables;
   QList<QCPGraph*> mGraphs; // extra list of plottables also in mPlottables that are of type QCPGraph
+  QList<QCPLineBasedGraph*> mLineGraphs; // extra list of plottables also in mPlottables that are of type QCPGraph
   QList<QCPAbstractItem*> mItems;
   QList<QCPLayer*> mLayers;
   QCP::AntialiasedElements mAntialiasedElements, mNotAntialiasedElements;
@@ -3786,6 +3798,7 @@ protected:
   // non-virtual methods:
   bool registerPlottable(QCPAbstractPlottable *plottable);
   bool registerGraph(QCPGraph *graph);
+  bool registerLineGraph(QCPLineBasedGraph *graph);
   bool registerItem(QCPAbstractItem* item);
   void updateLayerIndices() const;
   QCPLayerable *layerableAt(const QPointF &pos, bool onlySelectable, QVariant *selectionDetails=0) const;
@@ -3803,6 +3816,7 @@ protected:
   friend class QCPAxisRect;
   friend class QCPAbstractPlottable;
   friend class QCPGraph;
+  friend class QCPLineBasedGraph;
   friend class QCPAbstractItem;
 };
 Q_DECLARE_METATYPE(QCustomPlot::LayerInsertMode)
@@ -5775,6 +5789,77 @@ protected:
 
 /* end of 'src/plottables/plottable-colormap.h' */
 
+class QCP_LIB_DECL QCPLineSegmentData
+{
+public:
+  QCPLineSegmentData() {}
+  QCPLineSegmentData(double x1_, double y1_, double x2_, double y2_)
+  { x1 = x1_; y1 = y1_; x2 = x2_; y2 = y2_; }
+
+
+  inline double sortKey() const { return x1; }
+  inline static QCPLineSegmentData fromSortKey(double sortKey) { return QCPLineSegmentData(sortKey, 0, 0, 0); }
+  inline static bool sortKeyIsMainKey() { return true; }
+
+  inline double mainKey() const { return x1; }
+  inline double mainValue() const { return y1; }
+
+  inline QCPRange valueRange() const { return QCPRange(y1, y2); } // open and close must lie between low and high, so we don't need to check them
+
+  //double key, open, high, low, close;
+  double x1, y1, x2, y2;
+};
+Q_DECLARE_TYPEINFO(QCPLineSegmentData, Q_PRIMITIVE_TYPE);
+typedef QCPDataContainer<QCPLineSegmentData> QCPLineSegmentDataContainer;
+
+class QCP_LIB_DECL QCPLineBasedGraph : public QCPAbstractPlottable1D<QCPLineSegmentData>
+{
+    Q_OBJECT
+    /// \cond INCLUDE_QPROPERTIES
+    Q_PROPERTY(double width READ width WRITE setWidth)
+    Q_PROPERTY(bool adaptiveSampling READ adaptiveSampling WRITE setAdaptiveSampling)
+    /// \endcond
+  public:
+
+    explicit QCPLineBasedGraph(QCPAxis *keyAxis, QCPAxis *valueAxis);
+    virtual ~QCPLineBasedGraph() {}
+
+    // getters:
+    QSharedPointer<QCPLineSegmentDataContainer> data() const { return mDataContainer; }
+    double width() const { return mWidth; }
+    bool adaptiveSampling() const { return mAdaptiveSampling; }
+
+    // setters:
+    void setData(QSharedPointer<QCPLineSegmentDataContainer> data);
+    void setData(const QVector<double> x1s, const QVector<double> y1s, const QVector<double> x2s, const QVector<double> y2s);
+    void setWidth(double width) { mWidth = width; }
+    void setAdaptiveSampling(bool enabled) {mAdaptiveSampling = enabled; }
+
+    // non-property methods:
+    void addData(const QVector<double> x1s, const QVector<double> y1s, const QVector<double> x2s, const QVector<double> y2s, bool alreadySorted=false);
+    void addData(double x1, double y1, double x2, double y2);
+
+    QVector<QLineF> dataToLines(const QVector<QCPLineSegmentData> &data) const;
+
+    // reimplemented virtual methods:
+    virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE;
+    virtual QCPRange getKeyRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth) const Q_DECL_OVERRIDE;
+    virtual QCPRange getValueRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth, const QCPRange &inKeyRange=QCPRange()) const Q_DECL_OVERRIDE;
+
+  protected:
+    // property members:
+    bool mAdaptiveSampling;
+    double mWidth;
+
+    // reimplemented virtual methods:
+    virtual void draw(QCPPainter *painter) Q_DECL_OVERRIDE;
+    virtual void drawLegendIcon(QCPPainter *painter, const QRectF &rect) const Q_DECL_OVERRIDE;
+
+    virtual void getOptimizedLineData(QVector<QCPLineSegmentData> *lineData, const QCPLineSegmentDataContainer::const_iterator &begin, const QCPLineSegmentDataContainer::const_iterator &end) const;
+
+    friend class QCustomPlot;
+    friend class QCPLegend;
+};
 
 /* including file 'src/plottables/plottable-financial.h', size 8622          */
 /* commit 633339dadc92cb10c58ef3556b55570685fafb99 2016-09-13 23:54:56 +0200 */
@@ -5897,7 +5982,6 @@ protected:
   // reimplemented virtual methods:
   virtual void draw(QCPPainter *painter) Q_DECL_OVERRIDE;
   virtual void drawLegendIcon(QCPPainter *painter, const QRectF &rect) const Q_DECL_OVERRIDE;
-  
   // non-virtual methods:
   void drawOhlcPlot(QCPPainter *painter, const QCPFinancialDataContainer::const_iterator &begin, const QCPFinancialDataContainer::const_iterator &end, bool isSelected);
   void drawCandlestickPlot(QCPPainter *painter, const QCPFinancialDataContainer::const_iterator &begin, const QCPFinancialDataContainer::const_iterator &end, bool isSelected);
@@ -5906,7 +5990,6 @@ protected:
   double candlestickSelectTest(const QPointF &pos, const QCPFinancialDataContainer::const_iterator &begin, const QCPFinancialDataContainer::const_iterator &end, QCPFinancialDataContainer::const_iterator &closestDataPoint) const;
   void getVisibleDataBounds(QCPFinancialDataContainer::const_iterator &begin, QCPFinancialDataContainer::const_iterator &end) const;
   QRectF selectionHitBox(QCPFinancialDataContainer::const_iterator it) const;
-  
   friend class QCustomPlot;
   friend class QCPLegend;
 };

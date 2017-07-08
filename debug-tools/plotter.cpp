@@ -72,6 +72,7 @@ string PlotterPacket::toCSV() const
         else
             str.append("\n");
     }
+    return str;
 }
 
 }

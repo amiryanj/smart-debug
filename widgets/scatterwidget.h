@@ -14,6 +14,7 @@
 #include <QWidget>
 #include "qcustomplot/qcustomplot.h"
 #include "scatter.h"
+#include "colormanager.h"
 
 namespace Ui {
 class ScatterWidget;
@@ -33,6 +34,7 @@ public:
     void setData(const std::vector<PointD> &data, std::string legend = "Unknown Data");
     void clearData(std::string legend = "");
     void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line");
+    void addLineSegment(const PointD &p1, const PointD &p2, std::string legend = "");
     void enableRecording(bool enable);
     void setRenderPriority(bool real_time);
 
@@ -48,6 +50,7 @@ private slots:
 
 private:
     Ui::ScatterWidget *ui;
+    ColorManager colorManager;
 };
 }
 

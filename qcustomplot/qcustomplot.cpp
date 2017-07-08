@@ -8597,6 +8597,19 @@ QList<QCPGraph*> QCPAxis::graphs() const
   return result;
 }
 
+QList<QCPLineBasedGraph *> QCPAxis::lineGraphs() const
+{
+    QList<QCPLineBasedGraph*> result;
+    if (!mParentPlot) return result;
+
+    for (int i=0; i<mParentPlot->mLineGraphs.size(); ++i)
+    {
+      if (mParentPlot->mLineGraphs.at(i)->keyAxis() == this || mParentPlot->mLineGraphs.at(i)->valueAxis() == this)
+        result.append(mParentPlot->mLineGraphs.at(i));
+    }
+    return result;
+}
+
 /*!
   Returns a list of all the items that are associated with this axis. An item is considered
   associated with an axis if at least one of its positions uses the axis as key or value axis.
@@ -13522,6 +13535,84 @@ QList<QCPGraph*> QCustomPlot::selectedGraphs() const
   return result;
 }
 
+QCPLineBasedGraph *QCustomPlot::lineGraph(int index) const
+{
+    if (index >= 0 && index < mLineGraphs.size())
+    {
+      return mLineGraphs.at(index);
+    } else
+    {
+      qDebug() << Q_FUNC_INFO << "index out of bounds:" << index;
+      return 0;
+    }
+}
+
+QCPLineBasedGraph *QCustomPlot::lineGraph() const
+{
+    if (!mLineGraphs.isEmpty())
+    {
+      return mLineGraphs.last();
+    } else
+        return 0;
+}
+
+QCPLineBasedGraph *QCustomPlot::addLineGraph(QCPAxis *keyAxis, QCPAxis *valueAxis)
+{
+    if (!keyAxis) keyAxis = xAxis;
+    if (!valueAxis) valueAxis = yAxis;
+    if (!keyAxis || !valueAxis)
+    {
+      qDebug() << Q_FUNC_INFO << "can't use default QCustomPlot xAxis or yAxis, because at least one is invalid (has been deleted)";
+      return 0;
+    }
+    if (keyAxis->parentPlot() != this || valueAxis->parentPlot() != this)
+    {
+      qDebug() << Q_FUNC_INFO << "passed keyAxis or valueAxis doesn't have this QCustomPlot as parent";
+      return 0;
+    }
+
+    QCPLineBasedGraph *newGraph = new QCPLineBasedGraph(keyAxis, valueAxis);
+    newGraph->setName(QLatin1String("LineGraph ")+QString::number(mLineGraphs.size()));
+    return newGraph;
+}
+
+bool QCustomPlot::removeLineGraph(QCPLineBasedGraph *graph)
+{
+    return removePlottable(graph);
+}
+
+bool QCustomPlot::removeLineGraph(int index)
+{
+    if (index >= 0 && index < mLineGraphs.size())
+      return removeLineGraph(mLineGraphs[index]);
+    else
+        return false;
+}
+
+int QCustomPlot::clearLineGraphs()
+{
+    int c = mLineGraphs.size();
+    for (int i=c-1; i >= 0; --i)
+      removeLineGraph(mLineGraphs[i]);
+    return c;
+}
+
+int QCustomPlot::lineGraphCount() const
+{
+    return mLineGraphs.size();
+}
+
+QList<QCPLineBasedGraph *> QCustomPlot::selectedLineGraphs() const
+{
+    QList<QCPLineBasedGraph*> result;
+    foreach (QCPLineBasedGraph *graph, mLineGraphs)
+    {
+      if (graph->selected())
+        result.append(graph);
+    }
+    return result;
+}
+
 /*!
   Returns the item with \a index. If the index is invalid, returns 0.
   
@@ -15206,6 +15297,23 @@ bool QCustomPlot::registerGraph(QCPGraph *graph)
   return true;
 }
 
+bool QCustomPlot::registerLineGraph(QCPLineBasedGraph *graph)
+{
+    if (!graph)
+    {
+      qDebug() << Q_FUNC_INFO << "passed graph is zero";
+      return false;
+    }
+    if (mLineGraphs.contains(graph))
+    {
+      qDebug() << Q_FUNC_INFO << "graph already registered with this QCustomPlot";
+      return false;
+    }
+
+    mLineGraphs.append(graph);
+    return true;
+}
+
 
 /*! \internal
 
@@ -15306,9 +15414,19 @@ QList<QCPLayerable*> QCustomPlot::layerableListAt(const QPointF &pos, bool onlyS
       double dist = layerables.at(i)->selectTest(pos, onlySelectable, selectionDetails ? &details : 0);
       if (dist >= 0 && dist < selectionTolerance())
       {
-        result.append(layerables.at(i));
-        if (selectionDetails)
-          selectionDetails->append(details);
+          bool is_line_based = (dynamic_cast<QCPLineBasedGraph*>(layerables.at(i)) != NULL);
+          if(is_line_based)
+          {
+              result.append(layerables.at(i));
+              if (selectionDetails)
+                  selectionDetails->append(details);
+          }
+          else
+          {
+              result.prepend(layerables.at(i));
+              if (selectionDetails)
+                  selectionDetails->prepend(details);
+          }
       }
     }
   }
@@ -29022,7 +29140,7 @@ QPointF QCPItemPixmap::anchorPixelPosition(int anchorId) const
     case aiRight:       return (rect.topRight()+rect.bottomRight())*0.5;
     case aiBottom:      return (rect.bottomLeft()+rect.bottomRight())*0.5;
     case aiBottomLeft:  return rect.bottomLeft();
-    case aiLeft:        return (rect.topLeft()+rect.bottomLeft())*0.5;;
+    case aiLeft:        return (rect.topLeft()+rect.bottomLeft())*0.5;
   }
   
   qDebug() << Q_FUNC_INFO << "invalid anchorId" << anchorId;
@@ -29754,3 +29872,214 @@ QPen QCPItemBracket::mainPen() const
 /* end of 'src/items/item-bracket.cpp' */
 
 
+
+QCPLineBasedGraph::QCPLineBasedGraph(QCPAxis *keyAxis, QCPAxis *valueAxis)
+    :QCPAbstractPlottable1D<QCPLineSegmentData>(keyAxis, valueAxis)
+{
+    mParentPlot->registerLineGraph(this);
+    mWidth = 1;
+    setPen(QPen(Qt::blue, mWidth));
+    setBrush(Qt::NoBrush);
+
+    setAdaptiveSampling(false);
+}
+
+void QCPLineBasedGraph::addData(const QVector<double> x1s, const QVector<double> y1s, const QVector<double> x2s, const QVector<double> y2s, bool alreadySorted)
+{
+    if (x1s.size() != y1s.size())
+      qDebug() << Q_FUNC_INFO << "x1s and y1s have different sizes:" << x1s.size() << y1s.size();
+    int n = qMin(x1s.size(), y1s.size());
+    n = qMin(n, x2s.size());
+    n = qMin(n, y2s.size());
+    QVector<QCPLineSegmentData> tempData(n);
+    QVector<QCPLineSegmentData>::iterator it = tempData.begin();
+    const QVector<QCPLineSegmentData>::iterator itEnd = tempData.end();
+    int i = 0;
+    while (it != itEnd)
+    {
+      it->x1 = x1s[i];
+      it->y1 = y1s[i];
+      it->x2 = x2s[i];
+      it->y2 = y2s[i];
+      ++it;
+      ++i;
+    }
+    mDataContainer->add(tempData, alreadySorted); // don't modify tempData beyond this to prevent copy on write
+}
+
+void QCPLineBasedGraph::addData(double x1, double y1, double x2, double y2)
+{
+    mDataContainer->add(QCPLineSegmentData(x1, y1, x2, y2));
+}
+
+QVector<QLineF> QCPLineBasedGraph::dataToLines(const QVector<QCPLineSegmentData> &data) const
+{
+    QVector<QLineF> result;
+    QCPAxis *keyAxis = mKeyAxis.data();
+    QCPAxis *valueAxis = mValueAxis.data();
+    if (!keyAxis || !valueAxis) { qDebug() << Q_FUNC_INFO << "invalid key or value axis"; return result; }
+
+    result.reserve(data.size()+2); // added 2 to reserve memory for lower/upper fill base points that might be needed for fill
+    result.resize(data.size());
+
+    // transform data points to pixels:
+    if (keyAxis->orientation() == Qt::Vertical)
+    {
+        for (int i=0; i<data.size(); ++i)
+        {
+            result[i].setP1(QPointF(valueAxis->coordToPixel(data.at(i).y1),
+                                    keyAxis->coordToPixel(data.at(i).x1)));
+            result[i].setP2(QPointF(valueAxis->coordToPixel(data.at(i).y2),
+                                    keyAxis->coordToPixel(data.at(i).x2)));
+        }
+    } else // key axis is horizontal
+    {
+        for (int i=0; i<data.size(); ++i)
+        {
+            result[i].setP1(QPointF(keyAxis->coordToPixel(data.at(i).x1),
+                                    valueAxis->coordToPixel(data.at(i).y1)));
+            result[i].setP2(QPointF(keyAxis->coordToPixel(data.at(i).x2),
+                                    valueAxis->coordToPixel(data.at(i).y2)));
+        }
+    }
+    return result;
+}
+
+double QCPLineBasedGraph::selectTest(const QPointF &pos, bool onlySelectable, QVariant *details) const
+{
+    if ((onlySelectable && mSelectable == QCP::stNone) || mDataContainer->isEmpty())
+        return -1;
+    if (!mKeyAxis || !mValueAxis)
+        return -1;
+
+    if (mKeyAxis.data()->axisRect()->rect().contains(pos.toPoint()))
+    {
+        QCPLineSegmentDataContainer::const_iterator closestDataPoint = mDataContainer->constEnd();
+        // = pointDistance(pos, closestDataPoint);
+        QCPLineSegmentDataContainer::const_iterator begin, end;
+        begin = mDataContainer->constBegin();
+        end = mDataContainer->constEnd();
+        QVector<QCPLineSegmentData> lineData;
+        getOptimizedLineData(&lineData, begin, end);
+        QVector<QLineF> lines = dataToLines(lineData);
+        double minDistSqr = std::numeric_limits<double>::max();
+        QCPVector2D p(pos);
+        for (int i=0; i<lines.size(); i++)
+        {
+            const double currentDistSqr = p.distanceSquaredToLine(lines.at(i));
+            if (currentDistSqr < minDistSqr)
+                minDistSqr = currentDistSqr;
+        }
+        double result = qSqrt(minDistSqr);
+        if (details)
+        {
+            int pointIndex = closestDataPoint-mDataContainer->constBegin();
+            details->setValue(QCPDataSelection(QCPDataRange(pointIndex, pointIndex+1)));
+        }
+        return result;
+    } else
+        return -1;
+}
+
+QCPRange QCPLineBasedGraph::getKeyRange(bool &foundRange, QCP::SignDomain inSignDomain) const
+{
+    return mDataContainer->keyRange(foundRange, inSignDomain);
+}
+
+QCPRange QCPLineBasedGraph::getValueRange(bool &foundRange, QCP::SignDomain inSignDomain, const QCPRange &inKeyRange) const
+{
+    return mDataContainer->valueRange(foundRange, inSignDomain, inKeyRange);
+}
+
+void QCPLineBasedGraph::draw(QCPPainter *painter)
+{
+    if (!mKeyAxis || !mValueAxis) { qDebug() << Q_FUNC_INFO << "invalid key or value axis"; return; }
+    if (mKeyAxis.data()->range().size() <= 0 || mDataContainer->isEmpty()) return;
+
+
+    // loop over and draw segments of unselected/selected data:
+    QList<QCPDataRange> selectedSegments, unselectedSegments, allSegments;
+    getDataSegments(selectedSegments, unselectedSegments);
+    allSegments << unselectedSegments << selectedSegments;
+    for (int i=0; i<allSegments.size(); ++i)
+    {
+        bool isSelectedSegment = i >= unselectedSegments.size();
+        // get line pixel points appropriate to line style:
+        ///QCPDataRange lineDataRange = isSelectedSegment ? allSegments.at(i) : allSegments.at(i).adjusted(-1, 1); // unselected segments extend lines to bordering selected data point (safe to exceed total data bounds in first/last segment, getLines takes care)
+
+      QCPLineSegmentDataContainer::const_iterator begin, end;
+      begin = mDataContainer->constBegin();
+      end = mDataContainer->constEnd();
+
+      QVector<QCPLineSegmentData> lineData;
+      getOptimizedLineData(&lineData, begin, end);
+
+      // check data validity if flag set:
+  #ifdef QCUSTOMPLOT_CHECK_DATA
+      QCPLineSegmentDataContainer::const_iterator it;
+      for (it = mDataContainer->constBegin(); it != mDataContainer->constEnd(); ++it)
+      {
+        if (QCP::isInvalidData(it->x1, it->y1) || QCP::isInvalidData(it->x2, it->y2))
+          qDebug() << Q_FUNC_INFO << "data Line at" << it->x1 << "invalid." << "Plottable name:" << name();
+      }
+  #endif
+
+      // draw fill of graph:
+      if (isSelectedSegment && mSelectionDecorator)
+        mSelectionDecorator->applyBrush(painter);
+      else
+        painter->setBrush(mBrush);
+      //painter->setPen(Qt::NoPen);
+      //drawEndPoints()
+
+      // draw line:
+      if (isSelectedSegment && mSelectionDecorator)
+          mSelectionDecorator->applyPen(painter);
+      else
+          painter->setPen(mPen);
+      painter->setBrush(Qt::NoBrush);
+
+      // step plots can be drawn as a line plot
+      QVector<QLineF> lines = dataToLines(lineData);
+      foreach (QLineF line_i, lines)
+      {
+          painter->drawLine(line_i);
+      }
+    }
+
+    // draw other selection decoration that isn't just line/scatter pens and brushes:
+    if (mSelectionDecorator)
+      mSelectionDecorator->drawDecoration(painter, selection());
+}
+
+void QCPLineBasedGraph::drawLegendIcon(QCPPainter *painter, const QRectF &rect) const
+{
+    if (mBrush.style() != Qt::NoBrush)
+    {
+      applyFillAntialiasingHint(painter);
+      painter->fillRect(QRectF(rect.left(), rect.top()+rect.height()/2.0, rect.width(), rect.height()/3.0), mBrush);
+    }
+    // draw line vertically centered:
+    applyDefaultAntialiasingHint(painter);
+    painter->setPen(mPen);
+    painter->drawLine(QLineF(rect.left(), rect.top()+rect.height()/2.0, rect.right()+5, rect.top()+rect.height()/2.0)); // +5 on x2 else last segment is missing from dashed/dotted pens
+}
+
+void QCPLineBasedGraph::getOptimizedLineData(QVector<QCPLineSegmentData> *lineData, const QCPLineSegmentDataContainer::const_iterator &begin, const QCPLineSegmentDataContainer::const_iterator &end) const
+{
+    if (!lineData) return;
+    QCPAxis *keyAxis = mKeyAxis.data();
+    QCPAxis *valueAxis = mValueAxis.data();
+    if (!keyAxis || !valueAxis) { qDebug() << Q_FUNC_INFO << "invalid key or value axis"; return; }
+    if (begin == end) return;
+
+    int dataCount = end-begin;
+
+    QCPLineSegmentDataContainer::const_iterator it = begin;
+    lineData->reserve(dataCount+2); // +2 for possible fill end points
+    while (it != end)
+    {
+        lineData->append(*it);
+        ++it;
+    }
+}

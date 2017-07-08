@@ -42,8 +42,8 @@ class Plotter : public Plottable
 public:
     Plotter() {}
 
-    virtual void addValue(double val, double key = -1, std::string legend = "") {};
-    virtual void addPacket(const PlotterPacket& packet) {};
+    virtual void addValue(double val, double key = -1, std::string legend = ""){};
+    virtual void addPacket(const PlotterPacket& /*packet*/) {};
     virtual void reset() {};
 
 };

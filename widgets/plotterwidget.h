@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <qcustomplot.h>
 #include "plotter.h"
+#include "colormanager.h"
 
 namespace Ui {
 class PlotterWidget;
@@ -49,6 +50,7 @@ signals:
 private:
     Ui::PlotterWidget *ui;
     QGraphicsPixmapItem* statusGItem;
+    ColorManager colorManager;
 
     bool connected;
     bool freezed;

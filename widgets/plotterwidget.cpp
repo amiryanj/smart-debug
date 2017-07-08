@@ -94,13 +94,12 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
             g2 = ui->qPlot->addGraph(); // Add a blue dot in end of graph
             ui->qPlot->legend->removeItem(ui->qPlot->legend->itemCount()-1); // don't show two graphs in legend
 
-            Qt::GlobalColor color_code = Qt::GlobalColor((ui->qPlot->graphCount()/2)%13 + 6);
-            if(color_code == Qt::blue) color_code = Qt::darkGray;
+            QColor color_ = colorManager.getNewColor();
 
             g1->setName(QString::fromStdString(packet.legends[i]));
-            g1->setPen(QPen(color_code));
+            g1->setPen(QPen(color_));
 
-            g2->setPen(QPen(color_code));
+            g2->setPen(QPen(color_));
             g2->setLineStyle(QCPGraph::lsNone);
             g2->setScatterStyle(QCPScatterStyle::ssDisc);
             ui->qPlot->legend->setVisible(true);
