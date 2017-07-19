@@ -35,6 +35,7 @@ public:
     void clearData(std::string legend = "");
     void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line");
     void addLineSegment(const PointD &p1, const PointD &p2, std::string legend = "");
+    void addText(const std::string &text, const PointD &origin, int q_color = (int)Qt::black);
     void enableRecording(bool enable);
     void setRenderPriority(bool real_time);
 

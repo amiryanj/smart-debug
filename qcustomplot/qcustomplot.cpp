@@ -13287,6 +13287,8 @@ bool QCustomPlot::removePlottable(QCPAbstractPlottable *plottable)
   // special handling for QCPGraphs to maintain the simple graph interface:
   if (QCPGraph *graph = qobject_cast<QCPGraph*>(plottable))
     mGraphs.removeOne(graph);
+  if (QCPLineBasedGraph *line_graph = qobject_cast<QCPLineBasedGraph*>(plottable))
+    mLineGraphs.removeOne(line_graph);
   // remove plottable:
   delete plottable;
   mPlottables.removeOne(plottable);

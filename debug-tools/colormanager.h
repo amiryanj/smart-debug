@@ -20,7 +20,8 @@ class ColorManager: public QObject
     Q_OBJECT
 public:
     explicit ColorManager(QObject* parent = 0);
-    QColor getNewColor();
+    QColor getNewRandomColor();
+    QColor getNewDifferentColor();
     QColor getColor(int index);
 
 protected:

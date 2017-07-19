@@ -94,7 +94,7 @@ void PlotterWidget::addPacket(const PlotterPacket &packet)
             g2 = ui->qPlot->addGraph(); // Add a blue dot in end of graph
             ui->qPlot->legend->removeItem(ui->qPlot->legend->itemCount()-1); // don't show two graphs in legend
 
-            QColor color_ = colorManager.getNewColor();
+            QColor color_ = colorManager.getNewDifferentColor();
 
             g1->setName(QString::fromStdString(packet.legends[i]));
             g1->setPen(QPen(color_));
@@ -154,6 +154,39 @@ void PlotterWidget::addValue(double val, double key, string legend)
     packet.setKey(key);
 
     addPacket(packet);
+}
+
+void PlotterWidget::clearData(const string &legend)
+{
+    for(int i=ui->qPlot->graphCount()-1; i>=0; i--) {
+        if(legend.empty()) {
+            ui->qPlot->removeGraph(i);
+        }
+        else if(legend == ui->qPlot->graph(i)->name().toStdString()) {
+            ui->qPlot->removeGraph(i);
+            break;
+        }
+    }
+    for(int i=ui->qPlot->lineGraphCount()-1; i>=0; i--) {
+        if(legend.empty()) {
+            ui->qPlot->removeLineGraph(i);
+        }
+        else if(legend == ui->qPlot->lineGraph(i)->name().toStdString()) {
+            ui->qPlot->removeLineGraph(i);
+            break;
+        }
+    }
+
+    if(legend.empty())
+    {
+        int I = ui->qPlot->itemCount();
+        for(int i=I-1; i>=0; i--)
+        {
+            ui->qPlot->removeItem(i);
+        }
+    }
+
+    ui->qPlot->replot();
 }
 
 void PlotterWidget::reset()

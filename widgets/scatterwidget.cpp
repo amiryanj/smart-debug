@@ -67,7 +67,7 @@ void ScatterWidget::addPacket(const ScatterPacket &packet)
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(packet.legend));
-        QColor color_ = colorManager.getNewColor();
+        QColor color_ = colorManager.getNewDifferentColor();
         graph->setPen(QPen(color_));
         graph->setLineStyle(QCPGraph::lsNone);
         graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
@@ -133,7 +133,7 @@ void ScatterWidget::setData(const std::vector<PointD> &data, string legend)
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(legend));
-        QColor color_ = colorManager.getNewColor();
+        QColor color_ = colorManager.getNewDifferentColor();
         graph->setPen(QPen(color_));
         graph->setLineStyle(QCPGraph::lsNone);
         graph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssPlusCircle, 4));
@@ -173,22 +173,32 @@ void ScatterWidget::setData(const std::vector<PointD> &data, string legend)
 
 void ScatterWidget::clearData(string legend)
 {
-    for(int i=0; i<ui->scatter->graphCount(); i++) {
+    for(int i=ui->scatter->graphCount()-1; i>=0; i--) {
         if(legend.empty())
-            ui->scatter->graph(i)->data()->clear();
+            ui->scatter->removeGraph(i);
         else if(legend == ui->scatter->graph(i)->name().toStdString()) {
-            ui->scatter->graph(i)->data()->clear();
+            ui->scatter->removeGraph(i);
             break;
         }
     }
-    for(int i=0; i<ui->scatter->lineGraphCount(); i++) {
+    for(int i=ui->scatter->lineGraphCount()-1; i>=0; i--) {
         if(legend.empty())
-            ui->scatter->lineGraph(i)->data()->clear();
+            ui->scatter->removeLineGraph(i);
         else if(legend == ui->scatter->lineGraph(i)->name().toStdString()) {
-            ui->scatter->lineGraph(i)->data()->clear();
+            ui->scatter->removeLineGraph(i);
             break;
         }
+    }    
+
+    if(legend.empty())
+    {
+        int I = ui->scatter->itemCount();
+        for(int i=I-1; i>=0; i--)
+        {
+            ui->scatter->removeItem(i);
+        }
     }
+
     ui->scatter->replot();
 }
 
@@ -210,7 +220,7 @@ void ScatterWidget::addBaseLine(const PointD &p1, const PointD &p2, string legen
         graph = ui->scatter->addGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(legend));
-        QColor color_ = colorManager.getNewColor();
+        QColor color_ = colorManager.getNewDifferentColor();
         graph->setPen(QPen(color_));
     }
     QVector<double> keys, vals;
@@ -223,9 +233,8 @@ void ScatterWidget::addLineSegment(const PointD &p1, const PointD &p2, string le
 {
     //QCPGraph *graph = NULL;
     QCPLineBasedGraph * graph = NULL;
-    int nG = ui->scatter->graphCount();
-    int nLG = ui->scatter->lineGraphCount();
-    for(int j=0; j<nLG; j++)
+    int nG = ui->scatter->lineGraphCount();
+    for(int j=0; j<nG; j++)
     {
         if(ui->scatter->lineGraph(j)->name() == QString::fromStdString(legend))
         {
@@ -239,10 +248,18 @@ void ScatterWidget::addLineSegment(const PointD &p1, const PointD &p2, string le
         graph = ui->scatter->addLineGraph();
         // ----------------------- Scatter Configuration ---------------------------
         graph->setName(QString::fromStdString(legend));
-        QColor color_ = colorManager.getNewColor();
+        QColor color_ = colorManager.getNewDifferentColor();
         graph->setPen(QPen(color_));
     }
     graph->addData(p1.x, p1.y, p2.x, p2.y);
+}
+
+void ScatterWidget::addText(const string &text, const PointD &origin, int q_color)
+{
+    QCPItemText *textElem = new QCPItemText(ui->scatter);
+    textElem->setText(QString::fromStdString(text));
+    textElem->position->setCoords(origin.x, origin.y);
+    textElem->setColor(QColor((Qt::GlobalColor)q_color));
 }
 
 void ScatterWidget::enableRecording(bool enable)

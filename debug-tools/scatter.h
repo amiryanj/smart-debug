@@ -38,9 +38,10 @@ public:
     virtual void addPacket(const ScatterPacket& packet) {};
     virtual void addData(float x, float y, std::string legend = "Unknown") {};
     virtual void setData(const std::vector<PointD> &data, std::string legend = "Unknown") {};
-    virtual void clearData(std::string legend = "") {};
+    virtual void clearData(const std::string &legend = "") {};
     virtual void addBaseLine(const PointD &p1, const PointD &p2, std::string legend = "Unknown Line") {};
     virtual void addLineSegment(const PointD &p1, const PointD &p2, std::string legend = "") {};
+    virtual void addText(const std::string & text, const PointD &origin, int q_color = 2) {};
 
 };
 

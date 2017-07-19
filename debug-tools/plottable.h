@@ -20,6 +20,7 @@ public:
     Plottable();
 
     virtual void enableRecording(bool /*enable*/) {};
+    virtual void clearData(const std::string &legend = "") = 0;
     virtual void setCategory(const std::string &category_);
     std::string getCategory() const;
     void enableRealTimePlotting(bool val);
